@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { queryClient } from "./lib/queryClient";
 import { routeTree } from "./routeTree.gen";
-import { AuthProvider, useAuth } from "./lib/auth";
+import { AuthProvider, useAuth } from "./features/auth/lib/auth";
 
 const router = createRouter({
   routeTree,

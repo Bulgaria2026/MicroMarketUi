@@ -1,7 +1,7 @@
 import { createRootRouteWithContext, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Toaster } from "sonner";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../features/auth/lib/auth";
 
 interface MyRouterContext {
   auth: ReturnType<typeof useAuth>;

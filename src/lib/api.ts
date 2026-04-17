@@ -1,6 +1,10 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import type { AuthResponse } from "../types/auth";
+
+interface RefreshResponse {
+  accessToken: string;
+  expiresIn: number;
+}
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -28,7 +32,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-export const refreshAuth = async (): Promise<AuthResponse> => {
+export const refreshAuth = async (): Promise<RefreshResponse> => {
   if (isRefreshing) {
     return new Promise<string>((resolve, reject) => {
       failedQueue.push({ resolve, reject });
@@ -37,7 +41,7 @@ export const refreshAuth = async (): Promise<AuthResponse> => {
 
   isRefreshing = true;
   try {
-    const response = await api.post<AuthResponse>("/auth/refresh");
+    const response = await api.post<RefreshResponse>("/auth/refresh");
     setAccessToken(response.data.accessToken);
     processQueue(null, response.data.accessToken);
     return response.data;

@@ -1,14 +1,54 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import Grainient from "../components/Grainient";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { useAuth } from "../lib/auth";
+import { authService } from "../services/auth";
 
 export const Route = createFileRoute("/signup")({
+  beforeLoad: ({ context }) => {
+    if (context.auth.isAuthenticated) {
+      throw redirect({ to: "/" });
+    }
+  },
   component: SignUp,
 });
 
 function SignUp() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: authService.register,
+    meta: { suppressGlobalError: true },
+    onSuccess: data => {
+      login(data.accessToken);
+      navigate({ to: "/" });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPasswordError(null);
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirm-password");
+
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
+    if (email && password) {
+      mutation.mutate({ email: String(email), password: String(password) });
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full bg-background">
       <div className="flex w-full lg:w-1/2 flex-col items-center justify-center p-8">
@@ -18,21 +58,35 @@ function SignUp() {
             <p className="text-muted-foreground">Create an account to get started.</p>
           </div>
 
-          <form className="space-y-4" onSubmit={e => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
-              <Input id="email" type="email" placeholder="Enter your email" required />
+              <Input id="email" name="email" type="email" placeholder="Enter your email" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="Enter your password" required />
+              <Input id="password" name="password" type="password" placeholder="Enter your password" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm password</Label>
-              <Input id="confirm-password" type="password" placeholder="Confirm your password" required />
+              <Input
+                id="confirm-password"
+                name="confirm-password"
+                type="password"
+                placeholder="Confirm your password"
+                required
+              />
+              {passwordError && (
+                <p className="text-sm text-destructive">{passwordError}</p>
+              )}
             </div>
-            <Button type="submit" className="w-full mt-6">
-              Sign Up
+            {mutation.isError && (
+              <p className="text-sm text-destructive">
+                {(mutation.error as any)?.response?.data?.message || "Registration failed. Please try again."}
+              </p>
+            )}
+            <Button type="submit" className="w-full mt-6" disabled={mutation.isPending}>
+              {mutation.isPending ? "Signing Up..." : "Sign Up"}
             </Button>
           </form>
 

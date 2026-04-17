@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { refreshAuth, setAccessToken } from "./api";
+import { refreshAuth, setAccessToken } from "../../../lib/api";
 import { authService } from "../services/auth";
 
 interface User {

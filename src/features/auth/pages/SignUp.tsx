@@ -1,17 +1,17 @@
+import Grainient from "@/components/Grainient";
+import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field";
+import { getApiErrorMessage } from "@/lib/api";
+import { afterSubmit, useAppForm } from "@/lib/form";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import Grainient from "../../../components/Grainient";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
 import { useAuth } from "../lib/auth";
+import { emailField, passwordField } from "../schemas";
 import { authService } from "../services/auth";
 
 export function SignUp() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const mutation = useMutation({
     mutationFn: authService.register,
@@ -22,23 +22,12 @@ export function SignUp() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setPasswordError(null);
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const confirmPassword = formData.get("confirm-password");
-
-    if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match.");
-      return;
-    }
-
-    if (email && password) {
-      mutation.mutate({ email: String(email), password: String(password) });
-    }
-  };
+  const form = useAppForm({
+    defaultValues: { email: "", password: "", confirmPassword: "" },
+    onSubmit: async ({ value: { email, password } }) => {
+      await mutation.mutateAsync({ email, password });
+    },
+  });
 
   return (
     <div className="flex min-h-screen w-full bg-background">
@@ -49,36 +38,55 @@ export function SignUp() {
             <p className="text-muted-foreground">Create an account to get started.</p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input id="email" name="email" type="email" placeholder="Enter your email" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" placeholder="Enter your password" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm password</Label>
-              <Input
-                id="confirm-password"
-                name="confirm-password"
-                type="password"
-                placeholder="Confirm your password"
-                required
-              />
-              {passwordError && (
-                <p className="text-sm text-destructive">{passwordError}</p>
-              )}
-            </div>
+          <form
+            noValidate
+            className="space-y-4"
+            onSubmit={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup>
+              <form.AppField name="email" validators={afterSubmit(emailField)}>
+                {({ TextField }) => <TextField label="Email address" type="email" placeholder="Enter your email" />}
+              </form.AppField>
+
+              <form.AppField name="password" validators={afterSubmit(passwordField)}>
+                {({ TextField }) => <TextField label="Password" type="password" placeholder="Enter your password" />}
+              </form.AppField>
+
+              <form.AppField
+                name="confirmPassword"
+                validators={{
+                  onChangeListenTo: ["password"],
+                  onSubmit: ({ value, fieldApi }) =>
+                    value === fieldApi.form.getFieldValue("password") ? undefined : "Passwords do not match.",
+                  onChange: ({ value, fieldApi }) =>
+                    fieldApi.form.state.submissionAttempts > 0 && value === fieldApi.form.getFieldValue("password")
+                      ? undefined
+                      : "Passwords do not match.",
+                }}
+              >
+                {({ TextField }) => (
+                  <TextField label="Confirm password" type="password" placeholder="Confirm your password" />
+                )}
+              </form.AppField>
+            </FieldGroup>
+
             {mutation.isError && (
               <p className="text-sm text-destructive">
-                {(mutation.error as any)?.response?.data?.message || "Registration failed. Please try again."}
+                {getApiErrorMessage(mutation.error, "Registration failed. Please try again.")}
               </p>
             )}
-            <Button type="submit" className="w-full mt-6" disabled={mutation.isPending}>
-              {mutation.isPending ? "Signing Up..." : "Sign Up"}
-            </Button>
+
+            <form.Subscribe selector={state => state.isSubmitting}>
+              {isSubmitting => (
+                <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>
+                  {isSubmitting ? "Signing Up..." : "Sign Up"}
+                </Button>
+              )}
+            </form.Subscribe>
           </form>
 
           <div className="text-center text-sm">

@@ -1,5 +1,6 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "./api";
 
 declare module "@tanstack/react-query" {
   interface Register {
@@ -9,23 +10,18 @@ declare module "@tanstack/react-query" {
   }
 }
 
-function handleGlobalError(error: unknown, type: "query" | "mutation") {
-  console.error(`Global ${type} error:`, error);
-  const message =
-    (error as any)?.response?.data?.message ||
-    (error as Error)?.message ||
-    "An unexpected error occurred.";
-  toast.error(message);
+function handleGlobalError(error: unknown) {
+  toast.error(getApiErrorMessage(error, "An unexpected error occurred."));
 }
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: error => handleGlobalError(error, "query"),
+    onError: error => handleGlobalError(error),
   }),
   mutationCache: new MutationCache({
     onError: (error, _vars, _ctx, mutation) => {
       if (mutation.meta?.suppressGlobalError) return;
-      handleGlobalError(error, "mutation");
+      handleGlobalError(error);
     },
   }),
   defaultOptions: {

@@ -1,10 +1,14 @@
+import { getApiErrorMessage } from "@/lib/api";
+import { afterSubmit, useAppForm } from "@/lib/form";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import Grainient from "../../../components/Grainient";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import { isAxiosError } from "axios";
+
+import Grainient from "@/components/Grainient";
+import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field";
 import { useAuth } from "../lib/auth";
+import { emailField, passwordField } from "../schemas";
 import { authService } from "../services/auth";
 
 export function SignIn() {
@@ -20,15 +24,12 @@ export function SignIn() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
-    if (email && password) {
-      mutation.mutate({ email: String(email), password: String(password) });
-    }
-  };
+  const form = useAppForm({
+    defaultValues: { email: "", password: "" },
+    onSubmit: async ({ value }) => {
+      await mutation.mutateAsync(value);
+    },
+  });
 
   return (
     <div className="flex min-h-screen w-full bg-background">
@@ -66,23 +67,40 @@ export function SignIn() {
             <p className="text-muted-foreground">Enter your email and password to sign in.</p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input id="email" name="email" type="email" placeholder="Enter your email" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" placeholder="Enter your password" required />
-            </div>
+          <form
+            noValidate
+            className="space-y-4"
+            onSubmit={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup>
+              <form.AppField name="email" validators={afterSubmit(emailField)}>
+                {({ TextField }) => <TextField label="Email address" type="email" placeholder="Enter your email" />}
+              </form.AppField>
+
+              <form.AppField name="password" validators={afterSubmit(passwordField)}>
+                {({ TextField }) => <TextField label="Password" type="password" placeholder="Enter your password" />}
+              </form.AppField>
+            </FieldGroup>
+
             {mutation.isError && (
               <p className="text-sm text-destructive">
-                {(mutation.error as any)?.response?.data?.message || "Invalid email or password."}
+                {isAxiosError(mutation.error) && mutation.error.response?.status === 401
+                  ? "Invalid email or password."
+                  : getApiErrorMessage(mutation.error, "Something went wrong. Please try again.")}
               </p>
             )}
-            <Button type="submit" className="w-full mt-6" disabled={mutation.isPending}>
-              {mutation.isPending ? "Signing In..." : "Sign In"}
-            </Button>
+
+            <form.Subscribe selector={state => state.isSubmitting}>
+              {isSubmitting => (
+                <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>
+                  {isSubmitting ? "Signing In..." : "Sign In"}
+                </Button>
+              )}
+            </form.Subscribe>
           </form>
 
           <div className="text-center text-sm">

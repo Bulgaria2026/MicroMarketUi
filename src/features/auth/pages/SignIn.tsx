@@ -1,5 +1,5 @@
 import { getApiErrorMessage } from "@/lib/api";
-import { afterSubmit, useAppForm } from "@/lib/form";
+import { afterSubmit, useAppForm } from "@/components/form/form";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { isAxiosError } from "axios";
@@ -7,9 +7,9 @@ import { isAxiosError } from "axios";
 import Grainient from "@/components/Grainient";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
-import { useAuth } from "../lib/auth";
-import { emailField, passwordField } from "../schemas";
-import { authService } from "../services/auth";
+import { useAuth } from "@/features/auth/context/use-auth";
+import { emailField, passwordField } from "@/features/auth/schemas";
+import { authService } from "@/features/auth/services/auth";
 
 export function SignIn() {
   const { login } = useAuth();

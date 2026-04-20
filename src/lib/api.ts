@@ -1,13 +1,5 @@
 import axios, { isAxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
-
-export function getApiErrorMessage(error: unknown, fallback: string): string {
-  if (isAxiosError(error)) {
-    return error.response?.data?.detail ?? fallback;
-  }
-  return fallback;
-}
-
 interface RefreshResponse {
   accessToken: string;
   expiresIn: number;
@@ -25,10 +17,8 @@ export const setAccessToken = (token: string | null) => {
   accessToken = token;
 };
 
-export const getAccessToken = () => accessToken;
-
 export const refreshAuth = (): Promise<RefreshResponse> => {
-  if (refreshPromise) {
+  if (refreshPromise !== null) {
     return refreshPromise;
   }
 
@@ -48,6 +38,13 @@ export const refreshAuth = (): Promise<RefreshResponse> => {
 
   return refreshPromise;
 };
+
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (isAxiosError(error)) {
+    return error.response?.data?.detail ?? fallback;
+  }
+  return fallback;
+}
 
 // Proactively refresh before the token expires to avoid a round-trip 401
 api.interceptors.request.use(async config => {

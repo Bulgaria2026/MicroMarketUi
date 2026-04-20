@@ -1,13 +1,13 @@
 import { createRootRouteWithContext, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Toaster } from "sonner";
-import { useAuth } from "../features/auth/lib/auth";
+import { useAuth } from "@/features/auth/context/use-auth";
 
 interface MyRouterContext {
   auth: ReturnType<typeof useAuth>;
 }
 
-const RootLayout = () => {
+export const RootLayout = () => {
   const auth = useAuth();
   const { logout, isAuthenticated, user } = auth;
 

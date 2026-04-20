@@ -1,31 +1,10 @@
+import { App } from "@/App";
+import { AuthProvider } from "@/features/auth/context/auth";
+import "@/index.css";
+import { queryClient } from "@/lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { AuthProvider, useAuth } from "./features/auth/lib/auth";
-import "./index.css";
-import { queryClient } from "./lib/queryClient";
-import { routeTree } from "./routeTree.gen";
-
-const router = createRouter({
-  routeTree,
-  context: {
-    auth: undefined!,
-  },
-});
-
-// Register the router instance for type safety
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
-
-function App() {
-  const auth = useAuth();
-  if (auth.isLoading) return <div>Loading...</div>;
-  return <RouterProvider router={router} context={{ auth }} />;
-}
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {

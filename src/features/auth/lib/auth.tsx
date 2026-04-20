@@ -1,18 +1,24 @@
 import { jwtDecode } from "jwt-decode";
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { refreshAuth, setAccessToken } from "../../../lib/api";
 import { authService } from "../services/auth";
 
 interface User {
   id: string;
   email: string;
-  roles: string[];
+  roles: UserRole[];
 }
+
+const UserRole = {
+  ADMINISTRATOR: "ADMINISTRATOR",
+  USER: "USER",
+} as const;
+type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 interface JwtPayload {
   sub: string;
   email: string;
-  roles: string[];
+  roles: UserRole[];
 }
 
 interface AuthContextType {
@@ -42,7 +48,7 @@ function getUserFromToken(token: string): User | null {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    async function initAuth() {
+    (async () => {
       try {
         const data = await refreshAuth();
         if (mounted) {
@@ -70,16 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIsLoading(false);
         }
       }
-    }
-
-    initAuth();
+    })();
 
     return () => {
       mounted = false;
     };
   }, [login]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await authService.logout();
     } catch (e) {
@@ -88,24 +92,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccessToken(null);
       setUser(null);
     }
-  };
+  }, []);
 
-  const isAdmin = user?.roles?.some(role => role === "ADMINISTRATOR") ?? false;
+  const isAdmin = user?.roles?.includes(UserRole.ADMINISTRATOR) ?? false;
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isAdmin,
-        isLoading,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const authContextValue = useMemo(
+    () => ({
+      user,
+      isAuthenticated: !!user,
+      isAdmin,
+      isLoading,
+      login,
+      logout,
+    }),
+    [user, isAdmin, isLoading, login, logout],
   );
+
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

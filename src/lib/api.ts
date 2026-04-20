@@ -1,5 +1,12 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { jwtDecode } from "jwt-decode";
+
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (isAxiosError(error)) {
+    return error.response?.data?.detail ?? fallback;
+  }
+  return fallback;
+}
 
 interface RefreshResponse {
   accessToken: string;
@@ -12,8 +19,7 @@ export const api = axios.create({
 });
 
 let accessToken: string | null = null;
-let isRefreshing = false;
-let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+let refreshPromise: Promise<RefreshResponse> | null = null;
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
@@ -21,37 +27,26 @@ export const setAccessToken = (token: string | null) => {
 
 export const getAccessToken = () => accessToken;
 
-const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token!);
-    }
-  });
-  failedQueue = [];
-};
-
-export const refreshAuth = async (): Promise<RefreshResponse> => {
-  if (isRefreshing) {
-    return new Promise<string>((resolve, reject) => {
-      failedQueue.push({ resolve, reject });
-    }).then(token => ({ accessToken: token, expiresIn: 0 }));
+export const refreshAuth = (): Promise<RefreshResponse> => {
+  if (refreshPromise) {
+    return refreshPromise;
   }
 
-  isRefreshing = true;
-  try {
-    const response = await api.post<RefreshResponse>("/auth/refresh");
-    setAccessToken(response.data.accessToken);
-    processQueue(null, response.data.accessToken);
-    return response.data;
-  } catch (error) {
-    setAccessToken(null);
-    processQueue(error, null);
-    throw error;
-  } finally {
-    isRefreshing = false;
-  }
+  refreshPromise = api
+    .post<RefreshResponse>("/auth/refresh")
+    .then(response => {
+      setAccessToken(response.data.accessToken);
+      return response.data;
+    })
+    .catch(error => {
+      setAccessToken(null);
+      throw error;
+    })
+    .finally(() => {
+      refreshPromise = null;
+    });
+
+  return refreshPromise;
 };
 
 // Proactively refresh before the token expires to avoid a round-trip 401
@@ -60,26 +55,24 @@ api.interceptors.request.use(async config => {
     return config;
   }
 
-  let tokenToUse = accessToken;
-
-  if (accessToken) {
-    try {
-      const decoded = jwtDecode(accessToken);
-      const currentTime = Date.now() / 1000;
-
-      if (decoded.exp && decoded.exp < currentTime + 60) {
-        const data = await refreshAuth();
-        tokenToUse = data.accessToken;
-      }
-    } catch {
-      setAccessToken(null);
-      tokenToUse = null;
-      throw new Error("Session expired. Please sign in again.");
-    }
+  if (!accessToken) {
+    return config;
   }
 
-  if (tokenToUse) {
-    config.headers.Authorization = `Bearer ${tokenToUse}`;
+  try {
+    const decoded = jwtDecode(accessToken);
+    const currentTime = Date.now() / 1000;
+
+    if (decoded.exp && decoded.exp < currentTime + 60) {
+      const data = await refreshAuth();
+      setAccessToken(data.accessToken);
+      config.headers.Authorization = `Bearer ${data.accessToken}`;
+    } else {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+  } catch {
+    setAccessToken(null);
+    throw new Error("Session expired. Please sign in again.");
   }
 
   return config;
@@ -94,15 +87,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes("/auth/")) {
       originalRequest._retry = true;
 
-      try {
-        const data = await refreshAuth();
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-        return api(originalRequest);
-      } catch (err) {
-        return Promise.reject(err);
-      }
+      const data = await refreshAuth();
+      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+      return api(originalRequest);
     }
-
-    return Promise.reject(error);
+    throw error;
   },
 );

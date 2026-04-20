@@ -1,5 +1,5 @@
-import { api } from "../../../lib/api";
-import type { AuthResponse } from "../types";
+import { api } from "@/lib/api";
+import type { AuthResponse } from "@/features/auth/types";
 
 interface Credentials {
   email: string;

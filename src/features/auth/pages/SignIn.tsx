@@ -8,7 +8,7 @@ import Grainient from "@/components/Grainient";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { useAuth } from "@/features/auth/context/use-auth";
-import { emailField } from "@/features/auth/schemas";
+import { emailField, passwordLoginField } from "@/features/auth/schemas";
 import { authService } from "@/features/auth/services/auth";
 
 export function SignIn() {
@@ -81,7 +81,7 @@ export function SignIn() {
                 {({ TextField }) => <TextField label="Email address" type="email" placeholder="Enter your email" />}
               </form.AppField>
 
-              <form.AppField name="password">
+              <form.AppField name="password" validators={blurFirst(passwordLoginField)}>
                 {({ TextField }) => <TextField label="Password" type="password" placeholder="Enter your password" />}
               </form.AppField>
             </FieldGroup>

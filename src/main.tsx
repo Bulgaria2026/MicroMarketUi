@@ -1,11 +1,15 @@
 import { App } from "@/App";
-import { AuthProvider } from "@/features/auth/context/auth";
+import { AuthProvider } from "@/features/auth/context/auth-provider";
+import { installAuthInterceptors } from "@/features/auth/lib/install-interceptors";
 import "@/index.css";
+import { api } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { Toaster } from "sonner";
+
+installAuthInterceptors(api);
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {

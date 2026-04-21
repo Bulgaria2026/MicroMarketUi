@@ -1,6 +1,5 @@
-import { authService } from "@/features/auth/services/auth";
-import { refreshAuth, setAccessToken } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { authService } from "@/features/auth/auth-service";
+import { refreshAccessToken, setAccessToken } from "@/features/auth/lib/token-store";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
@@ -50,26 +49,21 @@ function getUserFromToken(token: string): User | null {
 
 export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const login = useCallback((token: string) => {
     setAccessToken(token);
     setUser(getUserFromToken(token));
   }, []);
 
-  const { data, isError, isLoading } = useQuery({
-    queryKey: ["authRefresh"],
-    queryFn: () => refreshAuth(),
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
-
   useEffect(() => {
-    if (data) {
-      login(data.accessToken);
-    } else if (isError) {
-      setAccessToken(null);
-    }
-  }, [data, isError, login]);
+    refreshAccessToken()
+      .then(data => login(data.accessToken))
+      .catch(() => {
+        // No valid session — stay logged out.
+      })
+      .finally(() => setIsLoading(false));
+  }, [login]);
 
   const logout = useCallback(async () => {
     try {

@@ -20,4 +20,9 @@ export const authService = {
   logout: async (): Promise<void> => {
     await api.post("/auth/logout");
   },
+
+  refresh: async (): Promise<AuthResponse> => {
+    const res = await api.post<AuthResponse>("/auth/refresh");
+    return res.data;
+  },
 };

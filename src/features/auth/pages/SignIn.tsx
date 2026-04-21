@@ -1,4 +1,4 @@
-import { afterSubmit, useAppForm } from "@/components/form/form";
+import { blurFirst, useAppForm } from "@/components/form/form";
 import { getApiErrorMessage } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -77,7 +77,7 @@ export function SignIn() {
             }}
           >
             <FieldGroup>
-              <form.AppField name="email" validators={afterSubmit(emailField)}>
+              <form.AppField name="email" validators={blurFirst(emailField)}>
                 {({ TextField }) => <TextField label="Email address" type="email" placeholder="Enter your email" />}
               </form.AppField>
 

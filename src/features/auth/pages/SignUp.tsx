@@ -1,4 +1,4 @@
-import { afterSubmit, useAppForm } from "@/components/form/form";
+import { blurFirst, useAppForm } from "@/components/form/form";
 import Grainient from "@/components/Grainient";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
@@ -48,11 +48,11 @@ export function SignUp() {
             }}
           >
             <FieldGroup>
-              <form.AppField name="email" validators={afterSubmit(emailField)}>
+              <form.AppField name="email" validators={blurFirst(emailField)}>
                 {({ TextField }) => <TextField label="Email address" type="email" placeholder="Enter your email" />}
               </form.AppField>
 
-              <form.AppField name="password" validators={afterSubmit(passwordField)}>
+              <form.AppField name="password" validators={blurFirst(passwordField)}>
                 {({ TextField }) => <TextField label="Password" type="password" placeholder="Enter your password" />}
               </form.AppField>
 
@@ -63,7 +63,7 @@ export function SignUp() {
                   onSubmit: ({ value, fieldApi }) =>
                     value === fieldApi.form.getFieldValue("password") ? undefined : "Passwords do not match.",
                   onChange: ({ value, fieldApi }) => {
-                    if (fieldApi.form.state.submissionAttempts < 1) return undefined;
+                    if (!fieldApi.state.meta.isBlurred) return undefined;
                     return value === fieldApi.form.getFieldValue("password") ? undefined : "Passwords do not match.";
                   },
                 }}

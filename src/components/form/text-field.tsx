@@ -21,7 +21,7 @@ export function TextField({
         placeholder={placeholder}
         aria-invalid={isInvalid}
         value={field.state.value}
-        onBlur={field.handleBlur}
+        onBlur={() => { field.handleBlur(); field.validate('change'); }}
         onChange={e => field.handleChange(e.target.value)}
       />
       {isInvalid && <FieldError>{field.state.meta.errors[0]}</FieldError>}

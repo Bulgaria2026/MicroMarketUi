@@ -1,6 +1,7 @@
-import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { getApiErrorMessage } from "@/lib/api";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
 
 declare module "@tanstack/react-query" {
   interface Register {
@@ -11,6 +12,7 @@ declare module "@tanstack/react-query" {
 }
 
 function handleGlobalError(error: unknown) {
+  if (isAxiosError(error) && error.response?.status === 401) return;
   toast.error(getApiErrorMessage(error, "An unexpected error occurred."));
 }
 

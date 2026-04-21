@@ -1,7 +1,6 @@
+import { useAuth } from "@/features/auth/context/use-auth";
 import { createRootRouteWithContext, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Toaster } from "sonner";
-import { useAuth } from "@/features/auth/context/use-auth";
 
 interface MyRouterContext {
   auth: ReturnType<typeof useAuth>;
@@ -37,7 +36,6 @@ export const RootLayout = () => {
       </div>
       <hr />
       <Outlet />
-      <Toaster position="top-right" richColors />
       <TanStackRouterDevtools />
     </>
   );

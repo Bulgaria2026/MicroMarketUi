@@ -1,13 +1,13 @@
+import { afterSubmit, useAppForm } from "@/components/form/form";
 import Grainient from "@/components/Grainient";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
-import { getApiErrorMessage } from "@/lib/api";
-import { afterSubmit, useAppForm } from "@/components/form/form";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/features/auth/context/use-auth";
 import { emailField, passwordField } from "@/features/auth/schemas";
 import { authService } from "@/features/auth/services/auth";
+import { getApiErrorMessage } from "@/lib/api";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 export function SignUp() {
   const { login } = useAuth();
@@ -62,10 +62,10 @@ export function SignUp() {
                   onChangeListenTo: ["password"],
                   onSubmit: ({ value, fieldApi }) =>
                     value === fieldApi.form.getFieldValue("password") ? undefined : "Passwords do not match.",
-                  onChange: ({ value, fieldApi }) =>
-                    fieldApi.form.state.submissionAttempts > 0 && value === fieldApi.form.getFieldValue("password")
-                      ? undefined
-                      : "Passwords do not match.",
+                  onChange: ({ value, fieldApi }) => {
+                    if (fieldApi.form.state.submissionAttempts < 1) return undefined;
+                    return value === fieldApi.form.getFieldValue("password") ? undefined : "Passwords do not match.";
+                  },
                 }}
               >
                 {({ TextField }) => (

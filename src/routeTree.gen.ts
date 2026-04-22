@@ -11,12 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
+import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
-import { Route as PublicSignupRouteImport } from './routes/_public/signup'
-import { Route as PublicSigninRouteImport } from './routes/_public/signin'
+import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
+import { Route as AuthSigninRouteImport } from './routes/_auth/signin'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/index'
 import { Route as AdminOrdersOrderIdRouteImport } from './routes/admin/orders/$orderId'
 
@@ -27,6 +28,10 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
 } as any)
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -49,15 +54,15 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const PublicSignupRoute = PublicSignupRouteImport.update({
+const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => PublicRouteRoute,
+  getParentRoute: () => AuthRouteRoute,
 } as any)
-const PublicSigninRoute = PublicSigninRouteImport.update({
+const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/signin',
   path: '/signin',
-  getParentRoute: () => PublicRouteRoute,
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
@@ -73,8 +78,8 @@ const AdminOrdersOrderIdRoute = AdminOrdersOrderIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/signin': typeof PublicSigninRoute
-  '/signup': typeof PublicSignupRoute
+  '/signin': typeof AuthSigninRoute
+  '/signup': typeof AuthSignupRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -82,21 +87,22 @@ export interface FileRoutesByFullPath {
   '/admin/orders/': typeof AdminOrdersIndexRoute
 }
 export interface FileRoutesByTo {
-  '/signin': typeof PublicSigninRoute
-  '/signup': typeof PublicSignupRoute
+  '/': typeof PublicIndexRoute
+  '/signin': typeof AuthSigninRoute
+  '/signup': typeof AuthSignupRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/users': typeof AdminUsersRoute
-  '/': typeof PublicIndexRoute
   '/admin': typeof AdminIndexRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_auth': typeof AuthRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
-  '/_public/signin': typeof PublicSigninRoute
-  '/_public/signup': typeof PublicSignupRoute
+  '/_auth/signin': typeof AuthSigninRoute
+  '/_auth/signup': typeof AuthSignupRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/users': typeof AdminUsersRoute
   '/_public/': typeof PublicIndexRoute
@@ -118,20 +124,21 @@ export interface FileRouteTypes {
     | '/admin/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/signin'
     | '/signup'
     | '/admin/products'
     | '/admin/users'
-    | '/'
     | '/admin'
     | '/admin/orders/$orderId'
     | '/admin/orders'
   id:
     | '__root__'
+    | '/_auth'
     | '/_public'
     | '/admin'
-    | '/_public/signin'
-    | '/_public/signup'
+    | '/_auth/signin'
+    | '/_auth/signup'
     | '/admin/products'
     | '/admin/users'
     | '/_public/'
@@ -141,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
 }
@@ -159,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PublicRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -189,19 +204,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/_public/signup': {
-      id: '/_public/signup'
+    '/_auth/signup': {
+      id: '/_auth/signup'
       path: '/signup'
       fullPath: '/signup'
-      preLoaderRoute: typeof PublicSignupRouteImport
-      parentRoute: typeof PublicRouteRoute
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
-    '/_public/signin': {
-      id: '/_public/signin'
+    '/_auth/signin': {
+      id: '/_auth/signin'
       path: '/signin'
       fullPath: '/signin'
-      preLoaderRoute: typeof PublicSigninRouteImport
-      parentRoute: typeof PublicRouteRoute
+      preLoaderRoute: typeof AuthSigninRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/admin/orders/': {
       id: '/admin/orders/'
@@ -220,15 +235,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthRouteRouteChildren {
+  AuthSigninRoute: typeof AuthSigninRoute
+  AuthSignupRoute: typeof AuthSignupRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthSigninRoute: AuthSigninRoute,
+  AuthSignupRoute: AuthSignupRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 interface PublicRouteRouteChildren {
-  PublicSigninRoute: typeof PublicSigninRoute
-  PublicSignupRoute: typeof PublicSignupRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
-  PublicSigninRoute: PublicSigninRoute,
-  PublicSignupRoute: PublicSignupRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
 
@@ -257,6 +282,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthRouteRoute: AuthRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
 }

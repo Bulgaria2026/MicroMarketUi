@@ -30,7 +30,7 @@ export function SignUp() {
   });
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex grow w-full bg-background">
       <div className="flex w-full lg:w-1/2 flex-col items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-2 text-center sm:text-left">

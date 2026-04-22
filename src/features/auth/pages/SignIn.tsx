@@ -32,7 +32,7 @@ export function SignIn() {
   });
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex grow w-full bg-background">
       <div className="relative hidden w-1/2 lg:block">
         <Grainient
           color1="#ffffff"

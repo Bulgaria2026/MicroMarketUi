@@ -1,38 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { formatCurrency, formatOrderDateTime, STATUS_CLASSES } from "@/features/admin/lib/order-utils";
 import { orderKeys, orderService } from "@/features/admin/services/order-service";
-import type { OrderDetail, OrderStatus } from "@/features/admin/types/order";
+import type { OrderDetail } from "@/features/admin/types/order";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
-const STATUS_CLASSES: Record<OrderStatus, string> = {
-  PENDING: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  COMPLETED: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-};
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(value);
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 interface OrderDetailContentProps {
   isLoading: boolean;
+  isError: boolean;
   order: OrderDetail | undefined;
 }
 
-function OrderDetailContent({ isLoading, order }: Readonly<OrderDetailContentProps>) {
+function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailContentProps>) {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -41,6 +23,10 @@ function OrderDetailContent({ isLoading, order }: Readonly<OrderDetailContentPro
         ))}
       </div>
     );
+  }
+
+  if (isError) {
+    return <p className="text-destructive">Failed to load order. Please try again.</p>;
   }
 
   if (!order) {
@@ -76,7 +62,7 @@ function OrderDetailContent({ isLoading, order }: Readonly<OrderDetailContentPro
         </div>
         <div>
           <p className="text-muted-foreground mb-0.5">Created</p>
-          <p>{formatDate(order.createdAt)}</p>
+          <p>{formatOrderDateTime(order.createdAt)}</p>
         </div>
       </div>
 
@@ -123,7 +109,7 @@ function OrderDetailContent({ isLoading, order }: Readonly<OrderDetailContentPro
 export function AdminOrderDetail() {
   const { orderId } = useParams({ from: "/admin/orders/$orderId" });
 
-  const { data: order, isLoading } = useQuery<OrderDetail>({
+  const { data: order, isLoading, isError } = useQuery<OrderDetail>({
     queryKey: orderKeys.detail(orderId),
     queryFn: () => orderService.findById(orderId),
   });
@@ -139,7 +125,7 @@ export function AdminOrderDetail() {
         <h2 className="text-2xl font-semibold">Order Details</h2>
       </div>
 
-      <OrderDetailContent isLoading={isLoading} order={order} />
+      <OrderDetailContent isLoading={isLoading} isError={isError} order={order} />
     </div>
   );
 }

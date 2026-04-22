@@ -15,10 +15,6 @@ const navItems = [
 function SidebarContent({ onNavigate }: Readonly<{ onNavigate?: () => void }>) {
   return (
     <>
-      <div className="px-4 pt-4 pb-4">
-        <Logo />
-      </div>
-
       <nav className="flex-1 px-2 py-2 space-y-0.5">
         {navItems.map(({ to, label, icon: Icon, exact }) => (
           <Link
@@ -55,6 +51,9 @@ export function AdminLayout() {
     <div className="flex h-screen overflow-hidden">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex w-56 shrink-0 flex-col border-r border-border bg-muted/40 overflow-y-auto">
+        <div className="px-4 pt-3 pb-2">
+          <Logo />
+        </div>
         <SidebarContent />
       </aside>
 
@@ -68,9 +67,12 @@ export function AdminLayout() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <Button variant="ghost" size="icon" className="absolute top-3 right-3" onClick={() => setSidebarOpen(false)}>
-          <X />
-        </Button>
+        <div className="flex items-center justify-between px-4 py-3 shrink-0">
+          <Logo />
+          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
+            <X />
+          </Button>
+        </div>
         <SidebarContent onNavigate={() => setSidebarOpen(false)} />
       </aside>
 

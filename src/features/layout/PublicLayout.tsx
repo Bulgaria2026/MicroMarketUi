@@ -18,7 +18,7 @@ export function PublicLayout() {
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-30 border-b border-border backdrop-blur-md">
         {/* Main row */}
-        <div className="relative flex items-center px-4 py-3">
+        <div className="mx-auto w-full max-w-[calc(100vh*16/9)] relative flex items-center px-4 py-3">
           <Logo />
 
           {/* Centered search — md+ only */}
@@ -110,7 +110,7 @@ export function PublicLayout() {
         </div>
 
         {/* Search row — mobile only */}
-        <div className="px-4 pb-3 md:hidden">
+        <div className="mx-auto w-full max-w-[calc(100vh*16/9)] px-4 pb-3 md:hidden">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <input
@@ -123,7 +123,9 @@ export function PublicLayout() {
       </header>
 
       <div className="flex flex-col flex-1">
-        <Outlet />
+        <div className="mx-auto w-full max-w-[calc(100vh*16/9)] flex flex-col flex-1 px-4">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

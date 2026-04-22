@@ -1,23 +1,6 @@
-import type { Order, OrderStatus } from "@/features/admin/types/order";
+import { formatCurrency, formatOrderDate, STATUS_CLASSES } from "@/features/admin/lib/order-utils";
+import type { Order } from "@/features/admin/types/order";
 import type { ColumnDef } from "@tanstack/react-table";
-
-const STATUS_CLASSES: Record<OrderStatus, string> = {
-  PENDING: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  COMPLETED: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-};
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(value);
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
 
 export const ordersColumns: ColumnDef<Order>[] = [
   {
@@ -60,6 +43,6 @@ export const ordersColumns: ColumnDef<Order>[] = [
   {
     accessorKey: "createdAt",
     header: "Created",
-    cell: ({ row }) => <span className="text-muted-foreground">{formatDate(row.original.createdAt)}</span>,
+    cell: ({ row }) => <span className="text-muted-foreground">{formatOrderDate(row.original.createdAt)}</span>,
   },
 ];

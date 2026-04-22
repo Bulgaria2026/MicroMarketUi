@@ -92,7 +92,7 @@ export function AdminOrders() {
     ...(search.toDate && { toDate: new Date(search.toDate).toISOString() }),
   };
 
-  const { data, isLoading, isPlaceholderData } = useQuery({
+  const { data, isLoading, isError, isPlaceholderData } = useQuery({
     queryKey: orderKeys.list(filter),
     queryFn: () => orderService.findAll(filter),
     placeholderData: keepPreviousData,
@@ -130,6 +130,10 @@ export function AdminOrders() {
     manualPagination: true,
     pageCount: totalPages,
   });
+
+  if (isError) {
+    return <p className="text-destructive">Failed to load orders. Please try again.</p>;
+  }
 
   return (
     <div>

@@ -1,9 +1,11 @@
 import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/features/cart/context/use-cart";
 import { checkoutService, type CheckoutStatusResponse } from "@/features/cart/services/checkout-service";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle, Clock, XCircle } from "lucide-react";
+import { useEffect } from "react";
 
 interface StatusContentProps {
   status: CheckoutStatusResponse["status"];
@@ -82,11 +84,16 @@ interface CheckoutSuccessProps {
 }
 
 export function CheckoutSuccess({ sessionId }: Readonly<CheckoutSuccessProps>) {
+  const { clearCart } = useCart();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["checkout", "session", sessionId],
     queryFn: () => checkoutService.getSessionStatus(sessionId),
     retry: 2,
   });
+
+  useEffect(() => {
+    if (data?.status === "PAID") clearCart();
+  }, [data?.status, clearCart]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center gap-4">

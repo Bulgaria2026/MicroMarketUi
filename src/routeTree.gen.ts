@@ -22,6 +22,7 @@ import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/inde
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users/$userId'
 import { Route as AdminOrdersOrderIdRouteImport } from './routes/admin/orders/$orderId'
 import { Route as PublicCheckoutSuccessRouteImport } from './routes/_public/checkout/success'
+import { Route as PublicCheckoutCancelRouteImport } from './routes/_public/checkout/cancel'
 
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
@@ -86,6 +87,11 @@ const PublicCheckoutSuccessRoute = PublicCheckoutSuccessRouteImport.update({
   path: '/checkout/success',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicCheckoutCancelRoute = PublicCheckoutCancelRouteImport.update({
+  id: '/checkout/cancel',
+  path: '/checkout/cancel',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof AuthSignupRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
+  '/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/checkout/success': typeof PublicCheckoutSuccessRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/signup': typeof AuthSignupRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin': typeof AdminIndexRoute
+  '/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/checkout/success': typeof PublicCheckoutSuccessRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/_public/': typeof PublicIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/_public/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/_public/checkout/success': typeof PublicCheckoutSuccessRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/products'
     | '/admin/'
+    | '/checkout/cancel'
     | '/checkout/success'
     | '/admin/orders/$orderId'
     | '/admin/users/$userId'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/products'
     | '/admin'
+    | '/checkout/cancel'
     | '/checkout/success'
     | '/admin/orders/$orderId'
     | '/admin/users/$userId'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/_public/'
     | '/admin/'
+    | '/_public/checkout/cancel'
     | '/_public/checkout/success'
     | '/admin/orders/$orderId'
     | '/admin/users/$userId'
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicCheckoutSuccessRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/checkout/cancel': {
+      id: '/_public/checkout/cancel'
+      path: '/checkout/cancel'
+      fullPath: '/checkout/cancel'
+      preLoaderRoute: typeof PublicCheckoutCancelRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
   }
 }
 
@@ -289,11 +308,13 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface PublicRouteRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicCheckoutCancelRoute: typeof PublicCheckoutCancelRoute
   PublicCheckoutSuccessRoute: typeof PublicCheckoutSuccessRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
+  PublicCheckoutCancelRoute: PublicCheckoutCancelRoute,
   PublicCheckoutSuccessRoute: PublicCheckoutSuccessRoute,
 }
 

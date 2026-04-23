@@ -21,7 +21,7 @@ export function CartPopover() {
   const [open, setOpen] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const { items, itemCount, removeItem, updateQuantity, clearCart } = useCart();
+  const { items, itemCount, removeItem, updateQuantity } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -44,7 +44,6 @@ export function CartPopover() {
     try {
       const orderItems = items.map(i => ({ productId: i.productId, quantity: i.quantity }));
       const response = await checkoutService.placeOrder(orderItems, email);
-      clearCart();
       setShowAuthDialog(false);
       navigate({ href: response.checkoutUrl });
     } catch {

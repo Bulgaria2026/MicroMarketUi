@@ -18,7 +18,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <Toaster position="top-right" richColors />
+        <Toaster position="bottom-right" richColors />
         <AuthProvider>
           <CartProvider>
             <App />

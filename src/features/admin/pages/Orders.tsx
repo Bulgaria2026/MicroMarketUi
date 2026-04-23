@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -161,22 +162,11 @@ export function AdminOrders() {
         </Field>
 
         <Field className="w-auto">
-          <FieldLabel>From</FieldLabel>
-          <Input
-            type="date"
-            value={search.fromDate ?? ""}
-            onChange={e => setSearch({ fromDate: e.target.value || undefined, page: 0 })}
-            className="h-8 text-sm"
-          />
-        </Field>
-
-        <Field className="w-auto">
-          <FieldLabel>To</FieldLabel>
-          <Input
-            type="date"
-            value={search.toDate ?? ""}
-            onChange={e => setSearch({ toDate: e.target.value || undefined, page: 0 })}
-            className="h-8 text-sm"
+          <FieldLabel>Date range</FieldLabel>
+          <DateRangePicker
+            from={search.fromDate}
+            to={search.toDate}
+            onChange={(from, to) => setSearch({ fromDate: from, toDate: to, page: 0 })}
           />
         </Field>
 

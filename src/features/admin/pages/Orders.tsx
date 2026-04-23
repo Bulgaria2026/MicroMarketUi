@@ -1,3 +1,4 @@
+import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -133,7 +134,7 @@ export function AdminOrders() {
   });
 
   if (isError) {
-    return <p className="text-destructive">Failed to load orders. Please try again.</p>;
+    return <ErrorDisplay />;
   }
 
   return (

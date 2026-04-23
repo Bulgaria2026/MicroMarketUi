@@ -1,9 +1,11 @@
+import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { useAuth } from "@/features/auth/context/use-auth";
 import { routeTree } from "@/routeTree.gen";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 const router = createRouter({
   routeTree,
+  defaultErrorComponent: ErrorDisplay,
   context: {
     auth: undefined!,
   },

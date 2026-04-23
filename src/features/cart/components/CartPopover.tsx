@@ -168,7 +168,7 @@ export function CartPopover() {
             <div className="flex items-center justify-between px-4 pt-4 pb-3">
               <span className="font-semibold text-sm">Cart Summary</span>
               <Popover.Close asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground transition-colors">
                   <X className="size-4" />
                 </Button>
               </Popover.Close>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -176,12 +177,15 @@ export function AdminOrders() {
 
         <Field className="w-auto">
           <FieldLabel>Order #</FieldLabel>
-          <Input
-            placeholder="Order number…"
-            value={search.orderNumber ?? ""}
-            onChange={e => setSearch({ orderNumber: e.target.value || undefined, page: 0 })}
-            className="h-8 text-sm w-40"
-          />
+          <InputGroup>
+            <InputGroupAddon>MM-</InputGroupAddon>
+            <InputGroupInput
+              placeholder="0000…"
+              value={search.orderNumber ?? ""}
+              onChange={e => setSearch({ orderNumber: e.target.value || undefined, page: 0 })}
+              className="h-8 -ml-1.5 text-sm w-40"
+            />
+          </InputGroup>
         </Field>
 
         <Field className="w-auto">

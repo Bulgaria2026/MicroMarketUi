@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { usersColumns } from "@/features/admin/components/users-columns";
 import { userKeys, userService } from "@/features/admin/services/user-service";
-import type { Customer, UserRole, UserStatus } from "@/features/admin/types/user";
+import type { Customer, CustomerType, UserRole, UserStatus } from "@/features/admin/types/user";
 import { cn } from "@/lib/utils";
 import { Route } from "@/routes/admin/users/index";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +21,12 @@ const ROLE_OPTIONS: { label: string; value: UserRole | "" }[] = [
   { label: "All roles", value: "" },
   { label: "User", value: "USER" },
   { label: "Administrator", value: "ADMINISTRATOR" },
+];
+
+const TYPE_OPTIONS: { label: string; value: CustomerType | "" }[] = [
+  { label: "All types", value: "" },
+  { label: "Profile", value: "PROFILE" },
+  { label: "Guest", value: "GUEST" },
 ];
 
 const STATUS_OPTIONS: { label: string; value: UserStatus | "" }[] = [
@@ -94,6 +100,7 @@ export function AdminUsers() {
     page: search.page,
     size: search.size,
     ...(search.email?.trim() && { email: search.email.trim() }),
+    ...(search.type && { type: search.type }),
     ...(search.role && { role: search.role }),
     ...(search.status && { status: search.status }),
     ...(search.createdFrom && { createdFrom: new Date(search.createdFrom).toISOString() }),
@@ -136,7 +143,7 @@ export function AdminUsers() {
     });
   }
 
-  const hasFilters = search.email || search.role || search.status || search.createdFrom || search.createdTo;
+  const hasFilters = search.email || search.type || search.role || search.status || search.createdFrom || search.createdTo;
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -164,6 +171,25 @@ export function AdminUsers() {
             onChange={e => setSearch({ email: e.target.value || undefined, page: 0 })}
             className="h-8 text-sm w-56"
           />
+        </Field>
+
+        <Field className="w-auto">
+          <FieldLabel>Type</FieldLabel>
+          <Select
+            value={search.type ?? "_all"}
+            onValueChange={val => setSearch({ type: val === "_all" ? undefined : (val as CustomerType), page: 0 })}
+          >
+            <SelectTrigger className="h-8 text-sm w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TYPE_OPTIONS.map(o => (
+                <SelectItem key={o.value || "_all"} value={o.value || "_all"}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Field>
 
         <Field className="w-auto">

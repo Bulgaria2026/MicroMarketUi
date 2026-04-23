@@ -24,6 +24,7 @@ export interface Customer {
 
 export interface CustomerFilter {
   email?: string;
+  type?: CustomerType;
   role?: UserRole;
   status?: UserStatus;
   createdFrom?: string;

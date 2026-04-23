@@ -6,6 +6,7 @@ const searchSchema = z.object({
   page: z.number().int().min(0).default(0),
   size: z.number().int().min(1).max(100).default(10),
   email: z.string().optional(),
+  type: z.enum(["GUEST", "PROFILE"]).optional(),
   role: z.enum(["USER", "ADMINISTRATOR"]).optional(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   createdFrom: z.string().optional(),

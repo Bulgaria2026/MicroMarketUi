@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/features/cart/context/use-cart";
+import { CheckoutAuthDialog } from "@/features/cart/components/CheckoutAuthDialog";
 import { checkoutService } from "@/features/cart/services/checkout-service";
 import type { Product } from "@/features/products/types/product";
 import { productKeys, productService } from "@/features/products/services/product-service";
+import { useAuth } from "@/features/auth/context/use-auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueries } from "@tanstack/react-query";
 import { ChevronDown, ShoppingCart, Trash2, X } from "lucide-react";
@@ -18,7 +20,9 @@ function effectivePrice(product: Product): number {
 export function CartPopover() {
   const [open, setOpen] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { items, itemCount, removeItem, updateQuantity, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const productQueries = useQueries({
@@ -35,12 +39,13 @@ export function CartPopover() {
     return sum + (product ? effectivePrice(product) * item.quantity : 0);
   }, 0);
 
-  async function handleCheckout() {
+  async function performCheckout(email?: string) {
     setIsCheckingOut(true);
     try {
       const orderItems = items.map(i => ({ productId: i.productId, quantity: i.quantity }));
-      const response = await checkoutService.placeOrder(orderItems);
+      const response = await checkoutService.placeOrder(orderItems, email);
       clearCart();
+      setShowAuthDialog(false);
       navigate({ href: response.checkoutUrl });
     } catch {
       toast.error("Failed to place order. Please try again.");
@@ -49,7 +54,16 @@ export function CartPopover() {
     }
   }
 
+  function handleCheckout() {
+    if (isAuthenticated) {
+      performCheckout();
+    } else {
+      setShowAuthDialog(true);
+    }
+  }
+
   return (
+    <>
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
         <Button variant="outline" size="icon" className="relative">
@@ -147,5 +161,13 @@ export function CartPopover() {
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
+
+    <CheckoutAuthDialog
+      open={showAuthDialog}
+      onClose={() => setShowAuthDialog(false)}
+      onGuestCheckout={email => performCheckout(email)}
+      isProcessing={isCheckingOut}
+    />
+    </>
   );
 }

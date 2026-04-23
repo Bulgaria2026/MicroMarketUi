@@ -1,56 +1,33 @@
-export type OrderStatus = "PENDING" | "COMPLETED" | "CANCELLED";
+export type OrderStatus = "PENDING_PAYMENT" | "PAID" | "PAYMENT_FAILED" | "CANCELLED" | "REFUNDED";
 
-export interface OrderItem {
+export interface OrderItemResponse {
   id: string;
   productId: string;
+  productName: string;
   quantity: number;
-  priceAtPurchase: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OrderProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  discount: number;
-  enabled: boolean;
-  amount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OrderItemDetail {
-  id: string;
-  product: OrderProduct;
-  quantity: number;
-  priceAtPurchase: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OrderDetail {
-  id: string;
-  status: OrderStatus;
-  customerId: string;
-  orderItems: OrderItemDetail[];
+  originalUnitPrice: number;
+  priceAtPurchase: number;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Order {
   id: string;
+  orderNumber: string;
   status: OrderStatus;
   customerId: string;
-  orderItems: OrderItem[];
+  email: string;
+  stripeCheckoutSessionId: string;
+  totalAmount: number;
+  orderItems: OrderItemResponse[];
   createdAt: string;
   updatedAt: string;
 }
 
 export interface OrderFilter {
   status?: OrderStatus;
-  customerId?: string;
+  orderNumber?: string;
+  email?: string;
   fromDate?: string;
   toDate?: string;
   page?: number;

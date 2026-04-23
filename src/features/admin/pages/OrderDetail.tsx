@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency, formatOrderDateTime, STATUS_CLASSES } from "@/features/admin/lib/order-utils";
 import { orderKeys, orderService } from "@/features/admin/services/order-service";
-import type { OrderDetail } from "@/features/admin/types/order";
+import type { Order } from "@/features/admin/types/order";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
@@ -12,7 +12,7 @@ import { ArrowLeft } from "lucide-react";
 interface OrderDetailContentProps {
   isLoading: boolean;
   isError: boolean;
-  order: OrderDetail | undefined;
+  order: Order | undefined;
 }
 
 function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailContentProps>) {
@@ -34,21 +34,20 @@ function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailC
     return <p className="text-muted-foreground">Order not found.</p>;
   }
 
-  const orderTotal = order.orderItems.reduce(
-    (sum, item) => sum + item.quantity * Number.parseFloat(item.priceAtPurchase),
-    0,
-  );
-
   return (
     <div className="space-y-6">
       <div className="rounded-lg border bg-card p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
         <div>
-          <p className="text-muted-foreground mb-0.5">Order ID</p>
-          <p className="font-mono">{order.id}</p>
+          <p className="text-muted-foreground mb-0.5">Order #</p>
+          <p className="font-mono">{order.orderNumber}</p>
         </div>
         <div>
-          <p className="text-muted-foreground mb-0.5">Customer ID</p>
-          <p className="font-mono">{order.customerId}</p>
+          <p className="text-muted-foreground mb-0.5">Order ID</p>
+          <p className="font-mono text-xs">{order.id}</p>
+        </div>
+        <div>
+          <p className="text-muted-foreground mb-0.5">Customer</p>
+          <p>{order.email}</p>
         </div>
         <div>
           <p className="text-muted-foreground mb-0.5">Status</p>
@@ -58,12 +57,16 @@ function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailC
               STATUS_CLASSES[order.status],
             )}
           >
-            {order.status}
+            {order.status.replace("_", " ")}
           </span>
         </div>
         <div>
           <p className="text-muted-foreground mb-0.5">Created</p>
           <p>{formatOrderDateTime(order.createdAt)}</p>
+        </div>
+        <div>
+          <p className="text-muted-foreground mb-0.5">Last updated</p>
+          <p>{formatOrderDateTime(order.updatedAt)}</p>
         </div>
       </div>
 
@@ -75,29 +78,28 @@ function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailC
               <TableRow>
                 <TableHead>Product</TableHead>
                 <TableHead>Qty</TableHead>
-                <TableHead>Unit Price</TableHead>
+                <TableHead>Original Price</TableHead>
+                <TableHead>Price at Purchase</TableHead>
                 <TableHead>Line Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {order.orderItems.map(item => (
                 <TableRow key={item.id}>
-                  <TableCell>
-                    <p className="font-medium">{item.product.name}</p>
-                    <p className="text-xs text-muted-foreground">{item.product.description}</p>
-                  </TableCell>
+                  <TableCell className="font-medium">{item.productName}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>{formatCurrency(Number.parseFloat(item.priceAtPurchase))}</TableCell>
-                  <TableCell>{formatCurrency(item.quantity * Number.parseFloat(item.priceAtPurchase))}</TableCell>
+                  <TableCell>{formatCurrency(item.originalUnitPrice)}</TableCell>
+                  <TableCell>{formatCurrency(item.priceAtPurchase)}</TableCell>
+                  <TableCell>{formatCurrency(item.quantity * item.priceAtPurchase)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={3} className="text-right font-medium">
+                <TableCell colSpan={4} className="text-right font-medium">
                   Total
                 </TableCell>
-                <TableCell className="font-semibold">{formatCurrency(orderTotal)}</TableCell>
+                <TableCell className="font-semibold">{formatCurrency(order.totalAmount)}</TableCell>
               </TableRow>
             </TableFooter>
           </Table>
@@ -114,7 +116,7 @@ export function AdminOrderDetail() {
     data: order,
     isLoading,
     isError,
-  } = useQuery<OrderDetail>({
+  } = useQuery<Order>({
     queryKey: orderKeys.detail(orderId),
     queryFn: () => orderService.findById(orderId),
   });
@@ -127,7 +129,9 @@ export function AdminOrderDetail() {
             <ArrowLeft />
           </Link>
         </Button>
-        <h2 className="text-2xl font-semibold">Order Details</h2>
+        <h2 className="text-2xl font-semibold">
+          {order ? `Order ${order.orderNumber}` : "Order Details"}
+        </h2>
       </div>
 
       <OrderDetailContent isLoading={isLoading} isError={isError} order={order} />

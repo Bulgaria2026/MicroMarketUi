@@ -4,14 +4,14 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 export const ordersColumns: ColumnDef<Order>[] = [
   {
-    accessorKey: "id",
-    header: "Order ID",
-    cell: ({ row }) => <span className="font-mono text-xs">{row.original.id.slice(0, 8)}…</span>,
+    accessorKey: "orderNumber",
+    header: "Order #",
+    cell: ({ row }) => <span className="font-mono text-xs">{row.original.orderNumber}</span>,
   },
   {
-    accessorKey: "customerId",
+    accessorKey: "email",
     header: "Customer",
-    cell: ({ row }) => <span className="font-mono text-xs">{row.original.customerId.slice(0, 8)}…</span>,
+    cell: ({ row }) => <span className="text-sm">{row.original.email}</span>,
   },
   {
     accessorKey: "status",
@@ -20,7 +20,7 @@ export const ordersColumns: ColumnDef<Order>[] = [
       <span
         className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_CLASSES[row.original.status]}`}
       >
-        {row.original.status}
+        {row.original.status.replace("_", " ")}
       </span>
     ),
   },
@@ -30,15 +30,9 @@ export const ordersColumns: ColumnDef<Order>[] = [
     cell: ({ row }) => row.original.orderItems.length,
   },
   {
-    id: "total",
+    accessorKey: "totalAmount",
     header: "Total",
-    cell: ({ row }) => {
-      const total = row.original.orderItems.reduce(
-        (sum, item) => sum + item.quantity * Number.parseFloat(item.priceAtPurchase),
-        0,
-      );
-      return formatCurrency(total);
-    },
+    cell: ({ row }) => formatCurrency(row.original.totalAmount),
   },
   {
     accessorKey: "createdAt",

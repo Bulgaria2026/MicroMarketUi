@@ -71,9 +71,11 @@ function OrdersTableBody({ isLoading, rows, pageSize, onRowClick }: Readonly<Ord
 
 const STATUS_OPTIONS: { label: string; value: OrderStatus | "" }[] = [
   { label: "All statuses", value: "" },
-  { label: "Pending", value: "PENDING" },
-  { label: "Completed", value: "COMPLETED" },
+  { label: "Pending Payment", value: "PENDING_PAYMENT" },
+  { label: "Paid", value: "PAID" },
+  { label: "Payment Failed", value: "PAYMENT_FAILED" },
   { label: "Cancelled", value: "CANCELLED" },
+  { label: "Refunded", value: "REFUNDED" },
 ];
 
 const PAGE_SIZES = [10, 25, 50];
@@ -89,7 +91,8 @@ export function AdminOrders() {
     page: search.page,
     size: search.size,
     ...(search.status && { status: search.status }),
-    ...(search.customerId?.trim() && { customerId: search.customerId.trim() }),
+    ...(search.orderNumber?.trim() && { orderNumber: search.orderNumber.trim() }),
+    ...(search.email?.trim() && { email: search.email.trim() }),
     ...(search.fromDate && { fromDate: new Date(search.fromDate).toISOString() }),
     ...(search.toDate && { toDate: new Date(search.toDate).toISOString() }),
   };
@@ -122,7 +125,7 @@ export function AdminOrders() {
     navigate({ search: { page: 0, size: search.size } });
   }
 
-  const hasFilters = search.status || search.customerId || search.fromDate || search.toDate;
+  const hasFilters = search.status || search.orderNumber || search.email || search.fromDate || search.toDate;
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -149,7 +152,7 @@ export function AdminOrders() {
             value={search.status ?? "_all"}
             onValueChange={val => setSearch({ status: val === "_all" ? undefined : (val as OrderStatus), page: 0 })}
           >
-            <SelectTrigger className="h-8 text-sm w-40">
+            <SelectTrigger className="h-8 text-sm w-44">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -172,11 +175,21 @@ export function AdminOrders() {
         </Field>
 
         <Field className="w-auto">
-          <FieldLabel>Customer ID</FieldLabel>
+          <FieldLabel>Order #</FieldLabel>
           <Input
-            placeholder="UUID…"
-            value={search.customerId ?? ""}
-            onChange={e => setSearch({ customerId: e.target.value || undefined, page: 0 })}
+            placeholder="Order number…"
+            value={search.orderNumber ?? ""}
+            onChange={e => setSearch({ orderNumber: e.target.value || undefined, page: 0 })}
+            className="h-8 text-sm w-40"
+          />
+        </Field>
+
+        <Field className="w-auto">
+          <FieldLabel>Email</FieldLabel>
+          <Input
+            placeholder="customer@example.com"
+            value={search.email ?? ""}
+            onChange={e => setSearch({ email: e.target.value || undefined, page: 0 })}
             className="h-8 text-sm w-52"
           />
         </Field>

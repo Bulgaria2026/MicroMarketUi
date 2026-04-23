@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { Order, OrderDetail, OrderFilter } from "@/features/admin/types/order";
+import type { Order, OrderFilter } from "@/features/admin/types/order";
 import type { PageResponse } from "@/types/api";
 
 export const orderService = {
@@ -7,8 +7,8 @@ export const orderService = {
     const res = await api.get<PageResponse<Order>>("/order", { params: filter });
     return res.data;
   },
-  findById: async (id: string): Promise<OrderDetail> => {
-    const res = await api.get<OrderDetail>(`/order/${id}`);
+  findById: async (id: string): Promise<Order> => {
+    const res = await api.get<Order>(`/order/${id}`);
     return res.data;
   },
 };

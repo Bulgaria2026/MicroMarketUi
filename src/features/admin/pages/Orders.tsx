@@ -9,7 +9,7 @@ import { ordersColumns } from "@/features/admin/components/orders-columns";
 import { orderKeys, orderService } from "@/features/admin/services/order-service";
 import type { Order, OrderStatus } from "@/features/admin/types/order";
 import { cn } from "@/lib/utils";
-import { Route } from "@/routes/admin/orders/index";
+import { Route } from "@/routes/admin/orders";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import type { Row } from "@tanstack/react-table";
@@ -25,10 +25,10 @@ interface OrdersTableBodyProps {
 
 function OrdersTableBody({ isLoading, rows, pageSize, onRowClick }: Readonly<OrdersTableBodyProps>) {
   if (isLoading) {
-    return Array.from({ length: pageSize }).map((_, i) => (
-      <TableRow key={i}>
-        {ordersColumns.map((_, j) => (
-          <TableCell key={j}>
+    return Array.from({ length: pageSize }, (_, i) => `skeleton-row-${i}`).map(rowKey => (
+      <TableRow key={rowKey}>
+        {ordersColumns.map(col => (
+          <TableCell key={col.id}>
             <Skeleton className="h-4 w-3/4" />
           </TableCell>
         ))}

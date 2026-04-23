@@ -1,3 +1,4 @@
+import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency, formatOrderDateTime, STATUS_CLASSES } from "@/features/admin/lib/order-utils";
@@ -26,7 +27,7 @@ function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailC
   }
 
   if (isError) {
-    return <p className="text-destructive">Failed to load order. Please try again.</p>;
+    return <ErrorDisplay />;
   }
 
   if (!order) {
@@ -109,7 +110,11 @@ function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailC
 export function AdminOrderDetail() {
   const { orderId } = useParams({ from: "/admin/orders/$orderId" });
 
-  const { data: order, isLoading, isError } = useQuery<OrderDetail>({
+  const {
+    data: order,
+    isLoading,
+    isError,
+  } = useQuery<OrderDetail>({
     queryKey: orderKeys.detail(orderId),
     queryFn: () => orderService.findById(orderId),
   });

@@ -1,8 +1,8 @@
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { ProfilePopover } from "@/features/auth/components/ProfilePopover";
 import { useAuth } from "@/features/auth/context/use-auth";
 import { CartPopover } from "@/features/cart/components/CartPopover";
-import { ProfilePopover } from "@/features/auth/components/ProfilePopover";
 import { Link, Outlet } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 

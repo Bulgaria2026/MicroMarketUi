@@ -1,5 +1,6 @@
 import type { Product, ProductFilter } from "@/features/products/types/product";
 import { api } from "@/lib/api";
+import type { PageResponse } from "@/types/api";
 
 export const productKeys = {
   all: ["products"] as const,
@@ -10,6 +11,12 @@ export const productKeys = {
 export const productService = {
   findById: async (id: string): Promise<Product> => {
     const res = await api.get<Product>(`/product/${id}`);
+    return res.data;
+  },
+    findAll: async (page: number, size = 20): Promise<PageResponse<Product>> => {
+    const res = await api.get<PageResponse<Product>>("/product", {
+      params: { page, size },
+    });
     return res.data;
   },
 };

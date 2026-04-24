@@ -18,7 +18,7 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
       <>
         <CheckCircle className="w-16 h-16" />
         <h1 className="text-2xl font-semibold">Payment confirmed!</h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground  max-w-120">
           Your order <span className="font-mono font-medium text-foreground">{orderNumber}</span> has been paid
           successfully. Thank you for your purchase.
         </p>
@@ -31,7 +31,7 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
       <>
         <Clock className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Payment pending</h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground max-w-120">
           Order <span className="font-mono font-medium text-foreground">{orderNumber}</span> is still being processed.
           Please check back in a moment.
         </p>
@@ -44,7 +44,7 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
       <>
         <XCircle className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Payment failed</h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground max-w-120">
           There has been a problem with your order. The payment was not successful. Please contact support if you have
           any questions regarding this issue. Your order number was{" "}
           <span className="font-mono font-medium text-foreground">{orderNumber}</span>.
@@ -58,7 +58,7 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
       <>
         <XCircle className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Order cancelled</h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground max-w-120">
           There has been a problem with your order. The payment was cancelled. Please contact support if you have any
           questions regarding this issue. Your order number was{" "}
           <span className="font-mono font-medium text-foreground">{orderNumber}</span>.
@@ -72,7 +72,7 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
       <>
         <CircleAlert className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Order refunded</h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground max-w-120">
           There has been a problem with your order. The payment was refunded. Please contact support if you have any
           questions regarding this issue. Your order number was{" "}
           <span className="font-mono font-medium text-foreground">{orderNumber}</span>.

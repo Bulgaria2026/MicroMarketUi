@@ -1,4 +1,4 @@
-import type { Product } from "@/features/admin/types/product";
+import type { Product } from "@/features/products/types/product";
 import { ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

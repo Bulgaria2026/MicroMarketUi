@@ -1,6 +1,7 @@
 import { App } from "@/App";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { installAuthInterceptors } from "@/features/auth/lib/install-interceptors";
+import { CartProvider } from "@/features/cart/context/cart-context";
 import "@/index.css";
 import { api } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
@@ -17,9 +18,11 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <Toaster position="top-right" richColors />
+        <Toaster position="bottom-right" richColors />
         <AuthProvider>
-          <App />
+          <CartProvider>
+            <App />
+          </CartProvider>
         </AuthProvider>
       </QueryClientProvider>
     </StrictMode>,

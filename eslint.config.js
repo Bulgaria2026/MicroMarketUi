@@ -23,7 +23,7 @@ export default defineConfig([
       'no-restricted-imports': ['error', { patterns: [{ regex: '^\\.' }] }],
       'react-refresh/only-export-components': ['error', {
         allowConstantExport: true,
-        allowExportNames: ['buttonVariants', 'Route', 'AuthContext'],
+        allowExportNames: ['buttonVariants', 'Route', 'AuthContext', 'CartContext'],
       }],
     },
   },

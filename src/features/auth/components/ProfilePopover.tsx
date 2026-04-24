@@ -33,7 +33,7 @@ export function ProfilePopover() {
           <div className="flex items-center justify-between mb-1">
             <span className="font-semibold text-sm">Profile</span>
             <Popover.Close asChild>
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground transition-colors">
                 <X className="size-4" />
               </Button>
             </Popover.Close>

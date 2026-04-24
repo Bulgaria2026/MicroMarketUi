@@ -15,6 +15,7 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
+import { Route as PublicOrdersRouteImport } from './routes/_public/orders'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth/signin'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
@@ -51,6 +52,11 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const PublicOrdersRoute = PublicOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/signup',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/orders': typeof PublicOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
   '/checkout/cancel': typeof PublicCheckoutCancelRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/orders': typeof PublicOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin': typeof AdminIndexRoute
   '/checkout/cancel': typeof PublicCheckoutCancelRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/_auth/signin': typeof AuthSigninRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/_public/orders': typeof PublicOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/_public/': typeof PublicIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/signin'
     | '/signup'
+    | '/orders'
     | '/admin/products'
     | '/admin/'
     | '/checkout/cancel'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/signin'
     | '/signup'
+    | '/orders'
     | '/admin/products'
     | '/admin'
     | '/checkout/cancel'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/_auth/signin'
     | '/_auth/signup'
+    | '/_public/orders'
     | '/admin/products'
     | '/_public/'
     | '/admin/'
@@ -232,6 +244,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/products'
       preLoaderRoute: typeof AdminProductsRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/_public/orders': {
+      id: '/_public/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof PublicOrdersRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_auth/signup': {
       id: '/_auth/signup'
@@ -307,12 +326,14 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 )
 
 interface PublicRouteRouteChildren {
+  PublicOrdersRoute: typeof PublicOrdersRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicCheckoutCancelRoute: typeof PublicCheckoutCancelRoute
   PublicCheckoutSuccessRoute: typeof PublicCheckoutSuccessRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicOrdersRoute: PublicOrdersRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicCheckoutCancelRoute: PublicCheckoutCancelRoute,
   PublicCheckoutSuccessRoute: PublicCheckoutSuccessRoute,

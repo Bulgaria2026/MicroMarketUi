@@ -5,17 +5,21 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/features/cart/context/use-cart";
 
 export function ProductCard({ product }: { product: Product }) {
-const { addItem } = useCart();
+  const { addItem } = useCart();
+
+  const isTouchDevice =
+  typeof window !== "undefined" &&
+  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
 
   return (
     <div className="group relative border rounded-2xl p-3 bg-background shadow-sm hover:shadow-md transition">
       
-      <div className="overflow-hidden rounded-xl bg-muted h-40 flex items-center justify-center">
+      <div className="overflow-hidden rounded-xl bg-muted aspect-square flex items-center justify-center">
         <span className="text-xs text-muted-foreground">image</span>
       </div>
 
       <div className="mt-3 space-y-1 pr-10">
-        
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold truncate">
             {product.name}
@@ -30,14 +34,23 @@ const { addItem } = useCart();
           {product.description}
         </p>
       </div>
-        <Button variant="default" size="icon" className={cn( 
-          "absolute bottom-3 right-3",
-          "h-10 w-10",
-          "opacity-0 translate-y-2",
-          "group-hover:opacity-100 group-hover:translate-y-0",
-          "transition-all duration-200")} onClick={() => addItem({ productId: product.id, quantity: 1 })}>
-          <ShoppingCart/>
-        </Button>
+
+    <Button
+      variant="default"
+      size="icon"
+      className={cn(
+        "absolute bottom-3 right-3 h-10 w-10 transition-all duration-200",
+        
+        isTouchDevice
+          ? "opacity-100 translate-y-0" 
+          : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
+      )}
+      onClick={() =>
+        addItem({ productId: product.id, quantity: 1 })
+      }
+    >
+      <ShoppingCart />
+    </Button>
     </div>
   );
 }

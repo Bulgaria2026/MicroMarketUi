@@ -4,7 +4,7 @@ import type { PageResponse } from "@/types/api";
 
 export const orderService = {
   findAll: async (filter: OrderFilter): Promise<PageResponse<Order>> => {
-    const res = await api.get<PageResponse<Order>>("/order", { params: filter });
+    const res = await api.get<PageResponse<Order>>("/order", { params: { ...filter, sort: "createdAt,desc" } });
     return res.data;
   },
   findById: async (id: string): Promise<Order> => {

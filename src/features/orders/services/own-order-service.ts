@@ -11,7 +11,7 @@ export interface OwnOrderFilter {
 
 export const ownOrderService = {
   findOwn: async (filter: OwnOrderFilter): Promise<PageResponse<Order>> => {
-    const res = await api.get<PageResponse<Order>>("/order/own", { params: filter });
+    const res = await api.get<PageResponse<Order>>("/order/own", { params: { ...filter, sort: "createdAt,desc" } });
     return res.data;
   },
 };

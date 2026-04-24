@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { productService } from "@/features/products/services/product-service";
-import { ProductCard } from "@/features/products/ProductCard";
+import { ProductCard } from "@/features/products/pages/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useRef } from "react";
 

@@ -4,9 +4,8 @@ MicroMarketUi is a React SPA for the MicroMarket platform.
 
 ## Requirements
 
-- [Bun](https://bun.sh) 1.x+
-- Node.js 20+ (for tooling compatibility)
-- A running instance of [MicroMarketApi](../MicroMarketApi/)
+- [Bun](https://bun.sh)
+- A running instance of [MicroMarketApi](https://github.com/Bulgaria2026/MicroMarketApi)
 
 ## Configuration
 

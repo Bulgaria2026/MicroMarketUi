@@ -2,8 +2,11 @@ import type { Product } from "@/features/admin/types/product";
 import { ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/features/cart/context/use-cart";
 
 export function ProductCard({ product }: { product: Product }) {
+const { addItem } = useCart();
+
   return (
     <div className="group relative border rounded-2xl p-3 bg-background shadow-sm hover:shadow-md transition">
       
@@ -32,8 +35,8 @@ export function ProductCard({ product }: { product: Product }) {
           "h-10 w-10",
           "opacity-0 translate-y-2",
           "group-hover:opacity-100 group-hover:translate-y-0",
-          "transition-all duration-200")}>
-          <ShoppingCart />
+          "transition-all duration-200")} onClick={() => addItem({ productId: product.id, quantity: 1 })}>
+          <ShoppingCart/>
         </Button>
     </div>
   );

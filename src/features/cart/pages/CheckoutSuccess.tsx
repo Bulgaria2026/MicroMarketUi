@@ -4,7 +4,7 @@ import { useCart } from "@/features/cart/context/use-cart";
 import { checkoutService, type CheckoutStatusResponse } from "@/features/cart/services/checkout-service";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { CheckCircle, Clock, XCircle } from "lucide-react";
+import { CheckCircle, CircleAlert, Clock, XCircle } from "lucide-react";
 import { useEffect } from "react";
 
 interface StatusContentProps {
@@ -45,8 +45,9 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
         <XCircle className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Payment failed</h1>
         <p className="text-muted-foreground">
-          We could not process the payment for order{" "}
-          <span className="font-mono font-medium text-foreground">{orderNumber}</span>. No charge was made.
+          There has been a problem with your order. The payment was not successful. Please contact support if you have
+          any questions regarding this issue. Your order number was{" "}
+          <span className="font-mono font-medium text-foreground">{orderNumber}</span>.
         </p>
       </>
     );
@@ -58,7 +59,9 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
         <XCircle className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Order cancelled</h1>
         <p className="text-muted-foreground">
-          Order <span className="font-mono font-medium text-foreground">{orderNumber}</span> has been cancelled.
+          There has been a problem with your order. The payment was cancelled. Please contact support if you have any
+          questions regarding this issue. Your order number was{" "}
+          <span className="font-mono font-medium text-foreground">{orderNumber}</span>.
         </p>
       </>
     );
@@ -67,10 +70,12 @@ function StatusContent({ status, orderNumber }: Readonly<StatusContentProps>) {
   if (status === "REFUNDED") {
     return (
       <>
-        <CheckCircle className="w-16 h-16 " />
+        <CircleAlert className="w-16 h-16 " />
         <h1 className="text-2xl font-semibold">Order refunded</h1>
         <p className="text-muted-foreground">
-          Order <span className="font-mono font-medium text-foreground">{orderNumber}</span> has been refunded.
+          There has been a problem with your order. The payment was refunded. Please contact support if you have any
+          questions regarding this issue. Your order number was{" "}
+          <span className="font-mono font-medium text-foreground">{orderNumber}</span>.
         </p>
       </>
     );

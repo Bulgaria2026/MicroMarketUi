@@ -12,7 +12,7 @@ import { ChevronsUpDown, ShoppingCart, Trash2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover } from "radix-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod/v4";
 
@@ -34,10 +34,17 @@ function QuantitySelector({
   const showCustom = quantity >= 5 || !options.includes(quantity);
 
   const [localValue, setLocalValue] = useState(String(quantity));
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLocalValue(String(quantity));
   }, [quantity]);
+
+  useEffect(() => {
+    if (showCustom) {
+      inputRef.current?.select();
+    }
+  }, [showCustom]);
 
   useEffect(() => {
     if (stock !== undefined && quantity > stock) {
@@ -74,6 +81,7 @@ function QuantitySelector({
     return (
       <div className="relative">
         <Input
+          ref={inputRef}
           type="number"
           min={1}
           max={max}

@@ -12,7 +12,7 @@ export function PublicLayout() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const routeSearch = useSearch({ strict: false }) as { name?: string };
+  const routeSearch = useSearch({ from: "/_public/" });
   const [searchValue, setSearchValue] = useState(routeSearch.name ?? "");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -21,7 +21,7 @@ export function PublicLayout() {
     debounceRef.current = setTimeout(() => {
       navigate({
         to: "/",
-        search: { name: searchValue || undefined } as { name?: string },
+        search: { name: searchValue },
       });
     }, 300);
     return () => {

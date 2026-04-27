@@ -1,13 +1,33 @@
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ProfilePopover } from "@/features/auth/components/ProfilePopover";
 import { useAuth } from "@/features/auth/context/use-auth";
 import { CartPopover } from "@/features/cart/components/CartPopover";
-import { Link, Outlet } from "@tanstack/react-router";
+import { Link, Outlet, useNavigate, useSearch } from "@tanstack/react-router";
 import { Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export function PublicLayout() {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const routeSearch = useSearch({ strict: false }) as { name?: string };
+  const [searchValue, setSearchValue] = useState(routeSearch.name ?? "");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      navigate({
+        to: "/",
+        search: { name: searchValue || undefined } as { name?: string },
+      });
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchValue, navigate]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -20,10 +40,11 @@ export function PublicLayout() {
           <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-lg px-4 pointer-events-none hidden md:block">
             <div className="relative pointer-events-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-              <input
-                type="text"
+              <Input
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="What are you looking for?"
-                className="w-full rounded-full border border-border bg-background pl-9 pr-4 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring/30 transition-shadow"
+                className="rounded-full pl-9"
               />
             </div>
           </div>
@@ -47,6 +68,8 @@ export function PublicLayout() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <input
               type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="What are you looking for?"
               className="w-full rounded-full border border-border bg-background pl-9 pr-4 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring/30 transition-shadow"
             />

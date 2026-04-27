@@ -41,6 +41,7 @@ export function PublicLayout() {
             <div className="relative pointer-events-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
+                name="search"
                 value={searchValue}
                 onChange={e => setSearchValue(e.target.value)}
                 placeholder="What are you looking for?"
@@ -67,6 +68,7 @@ export function PublicLayout() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <Input
+              name="search"
               type="text"
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}

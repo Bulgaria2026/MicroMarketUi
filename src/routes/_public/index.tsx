@@ -1,6 +1,12 @@
-import { ProductGrid } from "@/features/products/components/ProductGrid";
+import { ProductsPage } from "@/features/products/pages/ProductsPage";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+
+const searchSchema = z.object({
+  name: z.string().optional(),
+});
 
 export const Route = createFileRoute("/_public/")({
-  component: () => <ProductGrid />,
+  validateSearch: searchSchema,
+  component: ProductsPage,
 });

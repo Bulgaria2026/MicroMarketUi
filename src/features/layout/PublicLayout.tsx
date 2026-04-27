@@ -66,7 +66,7 @@ export function PublicLayout() {
         <div className="mx-auto w-full max-w-[calc(100vh*16/9)] px-4 pb-3 md:hidden">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            <input
+            <Input
               type="text"
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}

@@ -45,8 +45,8 @@ export function ProductGrid({ name }: Readonly<{ name?: string }>) {
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full">
         {isLoading
-          ? Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="border rounded-lg p-4 space-y-2">
+          ? Array.from({ length: 10 }, (_, i) => `skeleton-row-${i}`).map(rowKey => (
+              <div key={rowKey} className="border rounded-lg p-4 space-y-2">
                 <Skeleton className="h-32 w-full" />
                 <Skeleton className="h-4 w-3/4" />
               </div>

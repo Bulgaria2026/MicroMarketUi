@@ -1,5 +1,5 @@
-import { getRouteApi } from "@tanstack/react-router";
 import { ProductGrid } from "@/features/products/components/ProductGrid";
+import { getRouteApi } from "@tanstack/react-router";
 
 const routeApi = getRouteApi("/_public/");
 

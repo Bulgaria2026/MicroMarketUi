@@ -26,15 +26,18 @@ export function ProductGrid({ name }: Readonly<{ name?: string }>) {
     const el = loadMoreRef.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage();
-      }
-    });
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "0px 0px 300px 0px" },
+    );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
     <section className="px-8 py-6 space-y-4">

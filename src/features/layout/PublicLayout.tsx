@@ -42,7 +42,7 @@ export function PublicLayout() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
                 value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
+                onChange={e => setSearchValue(e.target.value)}
                 placeholder="What are you looking for?"
                 className="rounded-full pl-9"
               />
@@ -69,7 +69,7 @@ export function PublicLayout() {
             <input
               type="text"
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={e => setSearchValue(e.target.value)}
               placeholder="What are you looking for?"
               className="w-full rounded-full border border-border bg-background pl-9 pr-4 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring/30 transition-shadow"
             />

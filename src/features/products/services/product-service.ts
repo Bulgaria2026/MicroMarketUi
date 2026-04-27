@@ -13,7 +13,7 @@ export const productService = {
     const res = await api.get<Product>(`/product/${id}`);
     return res.data;
   },
-    findAll: async (page: number, size = 20, name?: string): Promise<PageResponse<Product>> => {
+  findAll: async (page: number, size = 20, name?: string): Promise<PageResponse<Product>> => {
     const res = await api.get<PageResponse<Product>>("/product", {
       params: { page, size, ...(name ? { name } : {}) },
     });

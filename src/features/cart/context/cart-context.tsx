@@ -1,5 +1,5 @@
 import type { CartItem } from "@/features/cart/types/cart";
-import { createContext, useEffect, useMemo, useReducer, type ReactNode } from "react";
+import { createContext, useCallback, useEffect, useMemo, useReducer, type ReactNode } from "react";
 
 interface CartState {
   items: CartItem[];
@@ -69,17 +69,17 @@ export function CartProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
+  const addItem = useCallback((item: CartItem) => dispatch({ type: "ADD_ITEM", payload: item }), []);
+  const removeItem = useCallback((productId: string) => dispatch({ type: "REMOVE_ITEM", payload: { productId } }), []);
+  const updateQuantity = useCallback(
+    (productId: string, quantity: number) => dispatch({ type: "UPDATE_QUANTITY", payload: { productId, quantity } }),
+    [],
+  );
+  const clearCart = useCallback(() => dispatch({ type: "CLEAR" }), []);
+
   const contextValue = useMemo(
-    () => ({
-      items: state.items,
-      itemCount,
-      addItem: (item: CartItem) => dispatch({ type: "ADD_ITEM", payload: item }),
-      removeItem: (productId: string) => dispatch({ type: "REMOVE_ITEM", payload: { productId } }),
-      updateQuantity: (productId: string, quantity: number) =>
-        dispatch({ type: "UPDATE_QUANTITY", payload: { productId, quantity } }),
-      clearCart: () => dispatch({ type: "CLEAR" }),
-    }),
-    [state.items, itemCount],
+    () => ({ items: state.items, itemCount, addItem, removeItem, updateQuantity, clearCart }),
+    [state.items, itemCount, addItem, removeItem, updateQuantity, clearCart],
   );
 
   return <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>;

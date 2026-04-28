@@ -6,7 +6,7 @@ const searchSchema = z.object({
   name: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_public/")({
+export const Route = createFileRoute("/_search/")({
   validateSearch: searchSchema,
   component: ProductsPage,
 });

@@ -10,10 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as SearchRouteRouteImport } from './routes/_search/route'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as SearchIndexRouteImport } from './routes/_search/index'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as PublicOrdersRouteImport } from './routes/_public/orders'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
@@ -30,6 +31,10 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRouteRoute = SearchRouteRouteImport.update({
+  id: '/_search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
@@ -43,10 +48,10 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const PublicIndexRoute = PublicIndexRouteImport.update({
+const SearchIndexRoute = SearchIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => PublicRouteRoute,
+  getParentRoute: () => SearchRouteRoute,
 } as any)
 const AdminProductsRoute = AdminProductsRouteImport.update({
   id: '/products',
@@ -100,7 +105,7 @@ const PublicCheckoutCancelRoute = PublicCheckoutCancelRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof PublicIndexRoute
+  '/': typeof SearchIndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
@@ -115,7 +120,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof PublicIndexRoute
+  '/': typeof SearchIndexRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
   '/orders': typeof PublicOrdersRoute
@@ -132,12 +137,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
+  '/_search': typeof SearchRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/_auth/signin': typeof AuthSigninRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/_public/orders': typeof PublicOrdersRoute
   '/admin/products': typeof AdminProductsRoute
-  '/_public/': typeof PublicIndexRoute
+  '/_search/': typeof SearchIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_public/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/_public/checkout/success': typeof PublicCheckoutSuccessRoute
@@ -180,12 +186,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/_public'
+    | '/_search'
     | '/admin'
     | '/_auth/signin'
     | '/_auth/signup'
     | '/_public/orders'
     | '/admin/products'
-    | '/_public/'
+    | '/_search/'
     | '/admin/'
     | '/_public/checkout/cancel'
     | '/_public/checkout/success'
@@ -198,6 +205,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
+  SearchRouteRoute: typeof SearchRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
 }
 
@@ -208,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_search': {
+      id: '/_search'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SearchRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public': {
@@ -231,12 +246,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/_public/': {
-      id: '/_public/'
+    '/_search/': {
+      id: '/_search/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof PublicIndexRouteImport
-      parentRoute: typeof PublicRouteRoute
+      preLoaderRoute: typeof SearchIndexRouteImport
+      parentRoute: typeof SearchRouteRoute
     }
     '/admin/products': {
       id: '/admin/products'
@@ -327,20 +342,30 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface PublicRouteRouteChildren {
   PublicOrdersRoute: typeof PublicOrdersRoute
-  PublicIndexRoute: typeof PublicIndexRoute
   PublicCheckoutCancelRoute: typeof PublicCheckoutCancelRoute
   PublicCheckoutSuccessRoute: typeof PublicCheckoutSuccessRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicOrdersRoute: PublicOrdersRoute,
-  PublicIndexRoute: PublicIndexRoute,
   PublicCheckoutCancelRoute: PublicCheckoutCancelRoute,
   PublicCheckoutSuccessRoute: PublicCheckoutSuccessRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
   PublicRouteRouteChildren,
+)
+
+interface SearchRouteRouteChildren {
+  SearchIndexRoute: typeof SearchIndexRoute
+}
+
+const SearchRouteRouteChildren: SearchRouteRouteChildren = {
+  SearchIndexRoute: SearchIndexRoute,
+}
+
+const SearchRouteRouteWithChildren = SearchRouteRoute._addFileChildren(
+  SearchRouteRouteChildren,
 )
 
 interface AdminRouteRouteChildren {
@@ -368,6 +393,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
+  SearchRouteRoute: SearchRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport

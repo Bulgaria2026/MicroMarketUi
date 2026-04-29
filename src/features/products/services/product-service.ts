@@ -7,7 +7,6 @@ export const productKeys = {
   list: (filter: ProductFilter) => ["products", "list", filter] as const,
   detail: (id: string) => ["products", "detail", id] as const,
 };
-
 export const productService = {
   findById: async (id: string): Promise<Product> => {
     const res = await api.get<Product>(`/product/${id}`);
@@ -17,6 +16,16 @@ export const productService = {
     const res = await api.get<PageResponse<Product>>("/product", {
       params: { page, size, ...(name ? { name } : {}) },
     });
+    return res.data;
+  },
+
+  update: async (id: string, data: Product): Promise<Product> => {
+    const res = await api.put<Product>(`/product/${id}`, data);
+    return res.data;
+  },
+
+  create: async (data: Omit<Product, "id" | "createdAt" | "updatedAt">): Promise<Product> => {
+    const res = await api.post<Product>("/product", data);
     return res.data;
   },
 };

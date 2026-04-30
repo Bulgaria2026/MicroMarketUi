@@ -1,16 +1,20 @@
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { useAppForm } from "@/components/form/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import {
+  buildProductFormValues,
+  productAmountValidator,
+  productDescriptionValidator,
+  productDiscountValidator,
+  productNameValidator,
+  productPriceValidator,
+  productValuesToRequest,
+} from "@/features/admin/lib/product-utils";
 import { productService } from "@/features/products/services/product-service";
+import { getApiErrorMessage } from "@/lib/api";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface CreateProductDialogProps {
   open: boolean;
@@ -18,142 +22,106 @@ interface CreateProductDialogProps {
   onCreated?: () => void;
 }
 
-export function CreateProductDialog({
-  open,
-  onOpenChange,
-  onCreated,
-}: CreateProductDialogProps) {
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: 0,
-    discount: 0,
-    amount: 0,
-    enabled: true,
-  });
+export function CreateProductDialog({ open, onOpenChange, onCreated }: Readonly<CreateProductDialogProps>) {
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  const [loading, setLoading] = useState(false);
-
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  }
-
-  async function handleCreate() {
-    if (!form.name.trim()) return;
-
-    setLoading(true);
-    try {
-      await productService.create({
-        ...form,
-        name: form.name.trim(),
-      });
-
-      setForm({
-        name: "",
-        description: "",
-        price: 0,
-        discount: 0,
-        amount: 0,
-        enabled: true,
-      });
-
+  const createMutation = useMutation({
+    meta: { suppressGlobalError: true },
+    mutationFn: productService.create,
+    onSuccess: () => {
       onOpenChange(false);
       onCreated?.();
-    } finally {
-      setLoading(false);
+    },
+    onError: err => setApiError(getApiErrorMessage(err, "Failed to create product")),
+  });
+
+  const form = useAppForm({
+    defaultValues: buildProductFormValues(),
+    onSubmit: ({ value }) => {
+      setApiError(null);
+      createMutation.mutate(productValuesToRequest(value));
+    },
+  });
+
+  function handleOpenChange(o: boolean) {
+    onOpenChange(o);
+    if (!o) {
+      form.reset();
+      setApiError(null);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-xl">Create Product</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <div className="space-y-3">
-            <Label>Name</Label>
-            <Input
-              placeholder="e.g. Sparkling Water"
-              value={form.name}
-              onChange={(e) => update("name", e.target.value)}
-            />
+        <form
+          id="create-product-form"
+          onSubmit={e => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <div className="space-y-4 mt-2">
+            <form.AppField name="name" validators={productNameValidator}>
+              {({ TextField }) => <TextField label="Name *" placeholder="e.g. Sparkling Water" />}
+            </form.AppField>
 
-            <Label>Description</Label>
-            <Textarea
-              placeholder="Write something about the product..."
-              value={form.description}
-              onChange={(e) => update("description", e.target.value)}
-              className="min-h-[80px]"
-            />
-          </div>
+            <form.AppField name="description" validators={productDescriptionValidator}>
+              {({ TextareaField }) => (
+                <TextareaField
+                  label="Description *"
+                  placeholder="Write something about the product…"
+                  rows={3}
+                />
+              )}
+            </form.AppField>
 
-          {/* Pricing */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Price</Label>
-              <Input
-                type="number"
-                value={form.price}
-                onChange={(e) => update("price", Number(e.target.value))}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <form.AppField name="priceInput" validators={productPriceValidator}>
+                {({ TextField }) => <TextField label="Price (€) *" type="number" placeholder="9.99" />}
+              </form.AppField>
+
+              <form.AppField name="discountInput" validators={productDiscountValidator}>
+                {({ TextField }) => <TextField label="Discount (%) *" type="number" placeholder="0" />}
+              </form.AppField>
             </div>
 
-            <div className="space-y-2">
-              <Label>Discount (%)</Label>
-              <Input
-                type="number"
-                value={form.discount}
-                onChange={(e) => update("discount", Number(e.target.value))}
-              />
-            </div>
+            <form.AppField name="amountInput" validators={productAmountValidator}>
+              {({ TextField }) => <TextField label="Stock *" type="number" placeholder="0" />}
+            </form.AppField>
+
+            <form.AppField name="enabled">
+              {({ state, handleChange }) => (
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <div>
+                    <p className="text-sm font-medium">Enabled</p>
+                    <p className="text-xs text-muted-foreground">Product is visible in the shop</p>
+                  </div>
+                  <Switch checked={state.value} onCheckedChange={handleChange} />
+                </div>
+              )}
+            </form.AppField>
           </div>
 
-          {/* Inventory */}
-          <div className="space-y-2">
-            <Label>Stock</Label>
-            <Input
-              type="number"
-              value={form.amount}
-              onChange={(e) => update("amount", Number(e.target.value))}
-            />
-          </div>
+          {apiError && <p className="text-sm text-destructive mt-3">{apiError}</p>}
+        </form>
 
-          {/* Status */}
-          <div className="flex items-center justify-between rounded-md border p-3">
-            <div>
-              <p className="text-sm font-medium">Enabled</p>
-              <p className="text-xs text-muted-foreground">
-                Product is visible in the shop
-              </p>
-            </div>
-
-            <Switch
-              checked={form.enabled}
-              onCheckedChange={(val: boolean) => update("enabled", val)}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              onClick={handleCreate}
-              disabled={!form.name.trim() || loading}
-            >
-              {loading ? "Creating..." : "Create Product"}
-            </Button>
-          </div>
-        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => handleOpenChange(false)} disabled={createMutation.isPending}>
+            Cancel
+          </Button>
+          <form.Subscribe selector={state => state.isSubmitting}>
+            {isSubmitting => (
+              <Button type="submit" form="create-product-form" disabled={isSubmitting || createMutation.isPending}>
+                {createMutation.isPending ? "Creating…" : "Create Product"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

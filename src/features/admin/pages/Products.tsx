@@ -1,8 +1,12 @@
 import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CreateProductDialog } from "@/features/admin/components/createproductdialog";
+import { productsColumns } from "@/features/admin/components/products-columns";
 import { productKeys, productService } from "@/features/products/services/product-service";
 import type { Product } from "@/features/products/types/product";
 import { cn } from "@/lib/utils";
@@ -12,10 +16,7 @@ import { useNavigate } from "@tanstack/react-router";
 import type { Row } from "@tanstack/react-table";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight, Package, Plus } from "lucide-react";
-import { useState } from "react";
-import { CreateProductDialog } from "@/features/admin/components/createproductdialog";
-
-import { productsColumns } from "@/features/admin/components/products-columns";
+import { useEffect, useState } from "react";
 
 interface ProductsTableBodyProps {
   isLoading: boolean;
@@ -63,9 +64,7 @@ function ProductsTableBody({ isLoading, rows, pageSize, onRowClick }: Readonly<P
       }}
     >
       {row.getVisibleCells().map(cell => (
-        <TableCell key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
+        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
       ))}
     </TableRow>
   ));
@@ -74,21 +73,46 @@ function ProductsTableBody({ isLoading, rows, pageSize, onRowClick }: Readonly<P
 const PAGE_SIZES = [10, 25, 50];
 
 export function AdminProducts() {
+  "use no memo";
+
   const queryClient = useQueryClient();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/admin/products/" });
   const [createOpen, setCreateOpen] = useState(false);
+  const [nameDraft, setNameDraft] = useState(search.name ?? "");
+
+  useEffect(() => {
+    setNameDraft(search.name ?? "");
+  }, [search.name]);
+
+  useEffect(() => {
+    const next = nameDraft.trim() || undefined;
+    if (next === search.name) return;
+    const t = setTimeout(() => {
+      navigate({ search: prev => ({ ...prev, name: next, page: 0 }) });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [nameDraft, search.name, navigate]);
+
+  const filter = {
+    page: search.page,
+    size: search.size,
+    ...(search.name?.trim() && { name: search.name.trim() }),
+    ...(search.enabled !== undefined && { enabled: search.enabled }),
+    ...(search.minPrice !== undefined && { minPrice: search.minPrice }),
+    ...(search.maxPrice !== undefined && { maxPrice: search.maxPrice }),
+  };
 
   const { data, isLoading, isError, isPlaceholderData } = useQuery({
-    queryKey: productKeys.list({ page: search.page, size: search.size }),
-    queryFn: () => productService.findAll(search.page, search.size),
+    queryKey: productKeys.list(filter),
+    queryFn: () => productService.findAllAdmin(filter),
     placeholderData: keepPreviousData,
   });
 
   const totalPages = data?.page.totalPages ?? 0;
 
   function setSearch(patch: Partial<typeof search>) {
-    navigate({ search: { ...search, ...patch } });
+    navigate({ search: prev => ({ ...prev, ...patch }) });
   }
 
   function setPage(page: number) {
@@ -96,10 +120,16 @@ export function AdminProducts() {
   }
 
   function prefetchPage(page: number) {
+    const nextFilter = { ...filter, page };
     queryClient.prefetchQuery({
-      queryKey: productKeys.list({ page, size: search.size }),
-      queryFn: () => productService.findAll(page, search.size),
+      queryKey: productKeys.list(nextFilter),
+      queryFn: () => productService.findAllAdmin(nextFilter),
     });
+  }
+
+  function clearFilters() {
+    setNameDraft("");
+    navigate({ search: { page: 0, size: search.size } });
   }
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -113,14 +143,85 @@ export function AdminProducts() {
 
   if (isError) return <ErrorDisplay />;
 
+  const hasFilters =
+    !!search.name || search.enabled !== undefined || search.minPrice !== undefined || search.maxPrice !== undefined;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold">Products</h2>
-      <Button size="sm" onClick={() => setCreateOpen(true)}>
-        <Plus className="mr-2 size-4" />
-        Create
-      </Button>
+        <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Plus className="mr-2 size-4" />
+          Create
+        </Button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-end gap-3 mb-4">
+        <Field className="w-auto">
+          <FieldLabel>Name</FieldLabel>
+          <Input
+            placeholder="Search name…"
+            value={nameDraft}
+            onChange={e => setNameDraft(e.target.value)}
+            className="h-8 text-sm w-56"
+          />
+        </Field>
+
+        <Field className="w-auto">
+          <FieldLabel>Status</FieldLabel>
+          <Select
+            value={search.enabled === undefined ? "_all" : String(search.enabled)}
+            onValueChange={val => setSearch({ enabled: val === "_all" ? undefined : val === "true", page: 0 })}
+          >
+            <SelectTrigger className="h-8 text-sm w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">All statuses</SelectItem>
+              <SelectItem value="true">Enabled</SelectItem>
+              <SelectItem value="false">Disabled</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+
+        <Field className="w-auto">
+          <FieldLabel>Min price</FieldLabel>
+          <Input
+            type="number"
+            inputMode="decimal"
+            placeholder="0"
+            value={search.minPrice ?? ""}
+            onChange={e => {
+              const v = e.target.value;
+              const n = v === "" ? undefined : Number(v);
+              setSearch({ minPrice: n !== undefined && Number.isFinite(n) ? n : undefined, page: 0 });
+            }}
+            className="h-8 text-sm w-28"
+          />
+        </Field>
+
+        <Field className="w-auto">
+          <FieldLabel>Max price</FieldLabel>
+          <Input
+            type="number"
+            inputMode="decimal"
+            placeholder="∞"
+            value={search.maxPrice ?? ""}
+            onChange={e => {
+              const v = e.target.value;
+              const n = v === "" ? undefined : Number(v);
+              setSearch({ maxPrice: n !== undefined && Number.isFinite(n) ? n : undefined, page: 0 });
+            }}
+            className="h-8 text-sm w-28"
+          />
+        </Field>
+
+        {hasFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="mb-0.5">
+            Clear
+          </Button>
+        )}
       </div>
 
       <div className={cn("rounded-md border transition-opacity", isPlaceholderData && "opacity-60")}>
@@ -157,10 +258,7 @@ export function AdminProducts() {
       <div className="flex items-center justify-between mt-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>Rows per page:</span>
-          <Select
-            value={String(search.size)}
-            onValueChange={val => setSearch({ size: Number(val), page: 0 })}
-          >
+          <Select value={String(search.size)} onValueChange={val => setSearch({ size: Number(val), page: 0 })}>
             <SelectTrigger className="h-7 text-sm w-16">
               <SelectValue />
             </SelectTrigger>
@@ -201,15 +299,16 @@ export function AdminProducts() {
               <ChevronRight />
             </Button>
           </div>
-          <CreateProductDialog
-            open={createOpen}
-            onOpenChange={setCreateOpen}
-            onCreated={() => {
-              queryClient.invalidateQueries({ queryKey: ["products"] });
-            }}
-          />
         </div>
       </div>
+
+      <CreateProductDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={() => {
+          queryClient.invalidateQueries({ queryKey: productKeys.all });
+        }}
+      />
     </div>
   );
 }

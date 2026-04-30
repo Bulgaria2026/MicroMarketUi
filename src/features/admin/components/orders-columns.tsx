@@ -30,9 +30,9 @@ export const ordersColumns: ColumnDef<Order>[] = [
     cell: ({ row }) => row.original.orderItems.length,
   },
   {
-    accessorKey: "totalAmount",
+    accessorKey: "paidTotal",
     header: "Total",
-    cell: ({ row }) => formatCurrency(row.original.totalAmount),
+    cell: ({ row }) => formatCurrency(row.original.paidTotal),
   },
   {
     accessorKey: "createdAt",

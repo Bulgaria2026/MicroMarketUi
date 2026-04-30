@@ -78,28 +78,68 @@ function OrderDetailContent({ isLoading, isError, order }: Readonly<OrderDetailC
               <TableRow>
                 <TableHead>Product</TableHead>
                 <TableHead>Qty</TableHead>
-                <TableHead>Original Price</TableHead>
+                <TableHead>Unit Price</TableHead>
+                <TableHead>Discount</TableHead>
                 <TableHead>Price at Purchase</TableHead>
                 <TableHead>Line Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {order.orderItems.map(item => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.productName}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>{formatCurrency(item.originalUnitPrice)}</TableCell>
-                  <TableCell>{formatCurrency(item.priceAtPurchase)}</TableCell>
-                  <TableCell>{formatCurrency(item.quantity * item.priceAtPurchase)}</TableCell>
-                </TableRow>
-              ))}
+              {order.orderItems.map(item => {
+                const discountPct =
+                  item.originalUnitPrice > 0 && item.originalUnitPrice !== item.priceAtPurchase
+                    ? Math.round((1 - item.priceAtPurchase / item.originalUnitPrice) * 100)
+                    : 0;
+                return (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.productName}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{formatCurrency(item.originalUnitPrice)}</TableCell>
+                    <TableCell>
+                      {discountPct > 0 ? (
+                        <span className="text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 px-1.5 py-0.5 rounded-md">
+                          -{discountPct}%
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{formatCurrency(item.priceAtPurchase)}</TableCell>
+                    <TableCell>{formatCurrency(item.quantity * item.priceAtPurchase)}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
             <TableFooter>
+              {order.subtotal !== order.paidTotal && (
+                <>
+                  {order.couponAmountOff != null && order.couponAmountOff > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-right font-medium text-green-600 dark:text-green-400">
+                        Coupon{order.couponCode ? ` (${order.couponCode})` : ""}
+                      </TableCell>
+                      <TableCell className="font-semibold text-green-600 dark:text-green-400">
+                        -{formatCurrency(order.couponAmountOff)}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {order.subtotal - order.paidTotal - (order.couponAmountOff ?? 0) > 0.001 && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-right font-medium text-green-600 dark:text-green-400">
+                        Product discounts
+                      </TableCell>
+                      <TableCell className="font-semibold text-green-600 dark:text-green-400">
+                        -{formatCurrency(order.subtotal - order.paidTotal - (order.couponAmountOff ?? 0))}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </>
+              )}
               <TableRow>
-                <TableCell colSpan={4} className="text-right font-medium">
-                  Total
+                <TableCell colSpan={5} className="text-right font-medium">
+                  {order.subtotal == order.paidTotal ? "Total" : "Total Paid"}
                 </TableCell>
-                <TableCell className="font-semibold">{formatCurrency(order.totalAmount)}</TableCell>
+                <TableCell className="font-semibold">{formatCurrency(order.paidTotal)}</TableCell>
               </TableRow>
             </TableFooter>
           </Table>
@@ -129,9 +169,7 @@ export function AdminOrderDetail() {
             <ArrowLeft />
           </Link>
         </Button>
-        <h2 className="text-2xl font-semibold">
-          {order ? `Order ${order.orderNumber}` : "Order Details"}
-        </h2>
+        <h2 className="text-2xl font-semibold">{order ? `Order ${order.orderNumber}` : "Order Details"}</h2>
       </div>
 
       <OrderDetailContent isLoading={isLoading} isError={isError} order={order} />

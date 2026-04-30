@@ -1,4 +1,4 @@
-import type { Product, ProductFilter } from "@/features/products/types/product";
+import type { Product, ProductFilter, ProductRequest } from "@/features/products/types/product";
 import { api } from "@/lib/api";
 import type { PageResponse } from "@/types/api";
 
@@ -17,6 +17,20 @@ export const productService = {
     const res = await api.get<PageResponse<Product>>("/product", {
       params: { page, size, ...(name ? { name } : {}) },
     });
+    return res.data;
+  },
+  findAllAdmin: async (filter: ProductFilter): Promise<PageResponse<Product>> => {
+    const res = await api.get<PageResponse<Product>>("/product", {
+      params: { ...filter, sort: "createdAt,desc" },
+    });
+    return res.data;
+  },
+  create: async (body: ProductRequest): Promise<Product> => {
+    const res = await api.post<Product>("/product", body);
+    return res.data;
+  },
+  update: async (id: string, body: ProductRequest): Promise<Product> => {
+    const res = await api.put<Product>(`/product/${id}`, body);
     return res.data;
   },
 };

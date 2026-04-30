@@ -1,5 +1,6 @@
-import { TextField } from "@/components/form/text-field";
 import { fieldContext, formContext } from "@/components/form/form-contexts";
+import { TextareaField } from "@/components/form/textarea-field";
+import { TextField } from "@/components/form/text-field";
 import { createFormHook } from "@tanstack/react-form";
 import type { z } from "zod";
 
@@ -18,6 +19,6 @@ export function blurFirst<T>(schema: z.ZodType<T>) {
 export const { useAppForm } = createFormHook({
   fieldContext,
   formContext,
-  fieldComponents: { TextField },
+  fieldComponents: { TextField, TextareaField },
   formComponents: {},
 });

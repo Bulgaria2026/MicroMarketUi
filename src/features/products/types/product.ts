@@ -16,3 +16,12 @@ export interface ProductFilter {
   page?: number;
   size?: number;
 }
+
+export interface ProductRequest {
+  name: string;
+  description: string;
+  price: number;
+  discount: number;
+  enabled: boolean;
+  amount: number;
+}

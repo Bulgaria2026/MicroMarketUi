@@ -2,6 +2,7 @@ import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { blurFirst, useAppForm } from "@/components/form/form";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { userKeys, userService } from "@/features/admin/services/user-service";
@@ -12,6 +13,7 @@ import { Route } from "@/routes/admin/users/$userId";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
 const ROLE_CLASSES: Record<UserRole, string> = {
   ADMINISTRATOR: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
@@ -155,6 +157,54 @@ function ProfileEditForm({ userId, profile }: Readonly<{ userId: string; profile
   );
 }
 
+function PointsAdjustmentForm({ userId, currentPoints }: Readonly<{ userId: string; currentPoints: number }>) {
+  const queryClient = useQueryClient();
+  const [value, setValue] = useState(String(currentPoints));
+
+  const updateMutation = useMutation({
+    meta: { suppressGlobalError: true },
+    mutationFn: (points: number) => userService.updateProfilePoints(userId, points),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.profile(userId) });
+    },
+  });
+
+  const isDirty = value !== String(currentPoints);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const points = Number.parseInt(value);
+    if (Number.isNaN(points) || points < 0) return;
+    updateMutation.mutate(points);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <h3 className="text-base font-medium">Adjust Points</h3>
+        <div className="flex items-end gap-3">
+          <Field className="w-auto">
+            <FieldLabel>Points Balance</FieldLabel>
+            <Input
+              type="number"
+              min="0"
+              value={value}
+              onChange={e => setValue(e.target.value)}
+              className="h-8 text-sm w-36"
+            />
+          </Field>
+          <Button type="submit" size="sm" disabled={!isDirty || updateMutation.isPending}>
+            {updateMutation.isPending ? "Saving…" : "Save"}
+          </Button>
+        </div>
+        {updateMutation.isError && (
+          <FieldError>{getApiErrorMessage(updateMutation.error, "Failed to update points")}</FieldError>
+        )}
+      </div>
+    </form>
+  );
+}
+
 function ProfileDetail({ userId }: Readonly<{ userId: string }>) {
   const {
     data: profile,
@@ -214,6 +264,7 @@ function ProfileDetail({ userId }: Readonly<{ userId: string }>) {
       </div>
 
       <ProfileEditForm key={profile.user.id} userId={userId} profile={profile} />
+      <PointsAdjustmentForm key={`pts-${profile.user.id}`} userId={userId} currentPoints={profile.points} />
     </div>
   );
 }

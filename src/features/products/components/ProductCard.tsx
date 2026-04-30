@@ -17,7 +17,22 @@ export function ProductCard({ product }: Readonly<{ product: Product }>) {
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold truncate">{product.name}</h3>
 
-          <span className="text-sm font-medium bg-muted px-2 py-0.5 rounded-md">{product.price.toFixed(2)}€</span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {product.discount > 0 && (
+              <>
+                <span className="text-xs text-muted-foreground line-through">{product.price.toFixed(2)}€</span>
+                <span className="text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 px-1.5 py-0.5 rounded-md">
+                  -{product.discount}%
+                </span>
+                <span className="text-sm font-medium bg-muted px-2 py-0.5 rounded-md">
+                  {(product.price * (1 - product.discount / 100)).toFixed(2)}€
+                </span>
+              </>
+            )}
+            {product.discount === 0 && (
+              <span className="text-sm font-medium bg-muted px-2 py-0.5 rounded-md">{product.price.toFixed(2)}€</span>
+            )}
+          </div>
         </div>
 
         <p className="text-sm text-muted-foreground line-clamp-2 overflow-hidden">{product.description}</p>

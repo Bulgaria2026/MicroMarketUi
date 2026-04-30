@@ -19,6 +19,10 @@ export const userService = {
     const res = await api.patch<User>(`/user/${id}`, patch);
     return res.data;
   },
+  updateProfilePoints: async (profileId: string, points: number): Promise<Profile> => {
+    const res = await api.put<Profile>(`/profile/${profileId}`, { points });
+    return res.data;
+  },
 };
 
 export const userKeys = {

@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProductCard } from "@/features/products/pages/ProductCard";
+import { ProductCard } from "@/features/products/components/ProductCard";
 import { productService } from "@/features/products/services/product-service";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";

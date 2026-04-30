@@ -1,14 +1,24 @@
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/context/use-auth";
+import { rewardsProfileKeys, rewardsProfileService } from "@/features/rewards/services/profile-service";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, ShoppingBag, X } from "lucide-react";
+import { Coins, LayoutDashboard, LogOut, ShoppingBag, X } from "lucide-react";
 import { Popover } from "radix-ui";
 import { useState } from "react";
 
 export function ProfilePopover() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const [open, setOpen] = useState(false);
+
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: rewardsProfileKeys.own,
+    queryFn: rewardsProfileService.getOwn,
+    enabled: isAuthenticated,
+  });
 
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
 
@@ -33,16 +43,38 @@ export function ProfilePopover() {
           <div className="flex items-center justify-between mb-1">
             <span className="font-semibold text-sm">Profile</span>
             <Popover.Close asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground transition-colors"
+              >
                 <X className="size-4" />
               </Button>
             </Popover.Close>
           </div>
-          <p className="text-xs text-muted-foreground mb-4 truncate">{user?.email}</p>
+          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+
+          <Separator className="my-3" />
+
           <Button asChild variant="outline" size="sm" className="w-full mb-2">
             <Link to="/orders">
               <ShoppingBag />
               My Orders
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="w-full mb-2">
+            <Link to="/rewards" className="flex items-center justify-between w-full">
+              <span className="flex items-center gap-2">
+                <Coins className="size-4" />
+                My Rewards
+              </span>
+              {profileLoading ? (
+                <Skeleton className="h-4 w-12" />
+              ) : (
+                <span className="tabular-nums text-xs text-muted-foreground">
+                  {(profile?.points ?? 0).toLocaleString()} pts
+                </span>
+              )}
             </Link>
           </Button>
           {isAdmin && (

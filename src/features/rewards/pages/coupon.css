@@ -1,0 +1,106 @@
+.mm-coupon {
+  width: 300px;
+  max-width: 100%;
+  height: 125px;
+  border-radius: 8px;
+  overflow: hidden;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  text-transform: uppercase;
+}
+
+.mm-coupon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20%;
+  height: 100%;
+  z-index: -1;
+  background-image: radial-gradient(circle at 0 50%, transparent 16px, var(--foreground) 17px);
+}
+
+.mm-coupon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80%;
+  height: 100%;
+  z-index: -1;
+  background-image: radial-gradient(circle at 100% 50%, transparent 16px, var(--card) 17px);
+}
+
+.mm-coupon > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mm-coupon-left {
+  width: 20%;
+  border-right: 2px dashed var(--foreground);
+  flex-shrink: 0;
+}
+
+.mm-coupon-left > div {
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  font-size: 0.5rem;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  color: var(--background);
+}
+
+.mm-coupon-center {
+  flex-grow: 1;
+  text-align: center;
+  padding: 6px 10px;
+}
+
+.mm-coupon-center h2 {
+  background: var(--foreground);
+  color: var(--background);
+  padding: 0px 8px;
+  font-size: 1.35rem;
+  white-space: nowrap;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.4;
+}
+
+.mm-coupon-center h3 {
+  font-size: 1.1rem;
+  color: var(--card-foreground);
+  font-weight: bold;
+  margin-top: 1px;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.mm-coupon-center small {
+  display: block;
+  font-size: 0.45rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--muted-foreground);
+  margin-top: 3px;
+}
+
+.mm-coupon-clickable {
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.mm-coupon-clickable:hover {
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.6));
+}
+
+.mm-coupon-inactive {
+  opacity: 0.5;
+}

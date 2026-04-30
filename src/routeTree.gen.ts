@@ -15,16 +15,17 @@ import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as SearchIndexRouteImport } from './routes/_search/index'
-import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as PublicRewardsRouteImport } from './routes/_public/rewards'
 import { Route as PublicOrdersRouteImport } from './routes/_public/orders'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth/signin'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
+import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin/orders/index'
 import { Route as AdminCouponsIndexRouteImport } from './routes/admin/coupons/index'
 import { Route as AdminCouponOffersIndexRouteImport } from './routes/admin/coupon-offers/index'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users/$userId'
+import { Route as AdminProductsProductIdRouteImport } from './routes/admin/products/$productId'
 import { Route as AdminOrdersOrderIdRouteImport } from './routes/admin/orders/$orderId'
 import { Route as AdminCouponOffersOfferIdRouteImport } from './routes/admin/coupon-offers/$offerId'
 import { Route as PublicCheckoutSuccessRouteImport } from './routes/_public/checkout/success'
@@ -57,11 +58,6 @@ const SearchIndexRoute = SearchIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SearchRouteRoute,
 } as any)
-const AdminProductsRoute = AdminProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const PublicRewardsRoute = PublicRewardsRouteImport.update({
   id: '/rewards',
   path: '/rewards',
@@ -87,6 +83,11 @@ const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -105,6 +106,11 @@ const AdminCouponOffersIndexRoute = AdminCouponOffersIndexRouteImport.update({
 const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
   id: '/users/$userId',
   path: '/users/$userId',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminProductsProductIdRoute = AdminProductsProductIdRouteImport.update({
+  id: '/products/$productId',
+  path: '/products/$productId',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminOrdersOrderIdRoute = AdminOrdersOrderIdRouteImport.update({
@@ -136,16 +142,17 @@ export interface FileRoutesByFullPath {
   '/signup': typeof AuthSignupRoute
   '/orders': typeof PublicOrdersRoute
   '/rewards': typeof PublicRewardsRoute
-  '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
   '/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/checkout/success': typeof PublicCheckoutSuccessRoute
   '/admin/coupon-offers/$offerId': typeof AdminCouponOffersOfferIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
+  '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/admin/coupon-offers/': typeof AdminCouponOffersIndexRoute
   '/admin/coupons/': typeof AdminCouponsIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -154,16 +161,17 @@ export interface FileRoutesByTo {
   '/signup': typeof AuthSignupRoute
   '/orders': typeof PublicOrdersRoute
   '/rewards': typeof PublicRewardsRoute
-  '/admin/products': typeof AdminProductsRoute
   '/admin': typeof AdminIndexRoute
   '/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/checkout/success': typeof PublicCheckoutSuccessRoute
   '/admin/coupon-offers/$offerId': typeof AdminCouponOffersOfferIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
+  '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/admin/coupon-offers': typeof AdminCouponOffersIndexRoute
   '/admin/coupons': typeof AdminCouponsIndexRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
+  '/admin/products': typeof AdminProductsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -176,17 +184,18 @@ export interface FileRoutesById {
   '/_auth/signup': typeof AuthSignupRoute
   '/_public/orders': typeof PublicOrdersRoute
   '/_public/rewards': typeof PublicRewardsRoute
-  '/admin/products': typeof AdminProductsRoute
   '/_search/': typeof SearchIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_public/checkout/cancel': typeof PublicCheckoutCancelRoute
   '/_public/checkout/success': typeof PublicCheckoutSuccessRoute
   '/admin/coupon-offers/$offerId': typeof AdminCouponOffersOfferIdRoute
   '/admin/orders/$orderId': typeof AdminOrdersOrderIdRoute
+  '/admin/products/$productId': typeof AdminProductsProductIdRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/admin/coupon-offers/': typeof AdminCouponOffersIndexRoute
   '/admin/coupons/': typeof AdminCouponsIndexRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -198,16 +207,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/orders'
     | '/rewards'
-    | '/admin/products'
     | '/admin/'
     | '/checkout/cancel'
     | '/checkout/success'
     | '/admin/coupon-offers/$offerId'
     | '/admin/orders/$orderId'
+    | '/admin/products/$productId'
     | '/admin/users/$userId'
     | '/admin/coupon-offers/'
     | '/admin/coupons/'
     | '/admin/orders/'
+    | '/admin/products/'
     | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -216,16 +226,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/orders'
     | '/rewards'
-    | '/admin/products'
     | '/admin'
     | '/checkout/cancel'
     | '/checkout/success'
     | '/admin/coupon-offers/$offerId'
     | '/admin/orders/$orderId'
+    | '/admin/products/$productId'
     | '/admin/users/$userId'
     | '/admin/coupon-offers'
     | '/admin/coupons'
     | '/admin/orders'
+    | '/admin/products'
     | '/admin/users'
   id:
     | '__root__'
@@ -237,17 +248,18 @@ export interface FileRouteTypes {
     | '/_auth/signup'
     | '/_public/orders'
     | '/_public/rewards'
-    | '/admin/products'
     | '/_search/'
     | '/admin/'
     | '/_public/checkout/cancel'
     | '/_public/checkout/success'
     | '/admin/coupon-offers/$offerId'
     | '/admin/orders/$orderId'
+    | '/admin/products/$productId'
     | '/admin/users/$userId'
     | '/admin/coupon-offers/'
     | '/admin/coupons/'
     | '/admin/orders/'
+    | '/admin/products/'
     | '/admin/users/'
   fileRoutesById: FileRoutesById
 }
@@ -302,13 +314,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchIndexRouteImport
       parentRoute: typeof SearchRouteRoute
     }
-    '/admin/products': {
-      id: '/admin/products'
-      path: '/products'
-      fullPath: '/admin/products'
-      preLoaderRoute: typeof AdminProductsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/_public/rewards': {
       id: '/_public/rewards'
       path: '/rewards'
@@ -344,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/products/': {
+      id: '/admin/products/'
+      path: '/products'
+      fullPath: '/admin/products/'
+      preLoaderRoute: typeof AdminProductsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/orders/': {
       id: '/admin/orders/'
       path: '/orders'
@@ -370,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/users/$userId'
       fullPath: '/admin/users/$userId'
       preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/products/$productId': {
+      id: '/admin/products/$productId'
+      path: '/products/$productId'
+      fullPath: '/admin/products/$productId'
+      preLoaderRoute: typeof AdminProductsProductIdRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/orders/$orderId': {
@@ -448,26 +467,28 @@ const SearchRouteRouteWithChildren = SearchRouteRoute._addFileChildren(
 )
 
 interface AdminRouteRouteChildren {
-  AdminProductsRoute: typeof AdminProductsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCouponOffersOfferIdRoute: typeof AdminCouponOffersOfferIdRoute
   AdminOrdersOrderIdRoute: typeof AdminOrdersOrderIdRoute
+  AdminProductsProductIdRoute: typeof AdminProductsProductIdRoute
   AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
   AdminCouponOffersIndexRoute: typeof AdminCouponOffersIndexRoute
   AdminCouponsIndexRoute: typeof AdminCouponsIndexRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
+  AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   AdminUsersIndexRoute: typeof AdminUsersIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminProductsRoute: AdminProductsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminCouponOffersOfferIdRoute: AdminCouponOffersOfferIdRoute,
   AdminOrdersOrderIdRoute: AdminOrdersOrderIdRoute,
+  AdminProductsProductIdRoute: AdminProductsProductIdRoute,
   AdminUsersUserIdRoute: AdminUsersUserIdRoute,
   AdminCouponOffersIndexRoute: AdminCouponOffersIndexRoute,
   AdminCouponsIndexRoute: AdminCouponsIndexRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
+  AdminProductsIndexRoute: AdminProductsIndexRoute,
   AdminUsersIndexRoute: AdminUsersIndexRoute,
 }
 

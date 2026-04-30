@@ -1,5 +1,6 @@
-import { authService } from "@/features/auth/auth-service";
 import { refreshAccessToken, setAccessToken } from "@/features/auth/lib/token-store";
+import { authService } from "@/features/auth/service/auth-service";
+import { queryClient } from "@/lib/queryClient";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
@@ -71,6 +72,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     } catch {
       // server-side cleanup failure
     } finally {
+      queryClient.clear();
       setAccessToken(null);
       setUser(null);
     }

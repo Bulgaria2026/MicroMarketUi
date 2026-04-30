@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { useAuth } from "@/features/auth/context/use-auth";
 import { emailField, passwordLoginField } from "@/features/auth/schemas";
-import { authService } from "@/features/auth/auth-service";
+import { authService } from "@/features/auth/service/auth-service";
 
 export function SignIn() {
   const { login } = useAuth();

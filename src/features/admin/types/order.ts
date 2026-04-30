@@ -18,7 +18,10 @@ export interface Order {
   customerId: string;
   email: string;
   stripeCheckoutSessionId: string;
-  totalAmount: number;
+  subtotal: number;
+  paidTotal: number;
+  couponCode: string | null;
+  couponAmountOff: number | null;
   orderItems: OrderItemResponse[];
   createdAt: string;
   updatedAt: string;

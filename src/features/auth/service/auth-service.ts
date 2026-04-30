@@ -1,5 +1,5 @@
-import { api } from "@/lib/api";
 import type { AuthResponse } from "@/features/auth/types";
+import { api } from "@/lib/api";
 
 interface Credentials {
   email: string;
@@ -7,6 +7,11 @@ interface Credentials {
 }
 
 export const authService = {
+  getOwnUser: async (): Promise<AuthResponse> => {
+    const res = await api.get("/user/own");
+    return res.data;
+  },
+
   login: async (credentials: Credentials): Promise<AuthResponse> => {
     const res = await api.post<AuthResponse>("/auth/login", credentials);
     return res.data;

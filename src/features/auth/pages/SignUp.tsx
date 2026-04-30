@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { useAuth } from "@/features/auth/context/use-auth";
 import { emailField, passwordField } from "@/features/auth/schemas";
-import { authService } from "@/features/auth/auth-service";
+import { authService } from "@/features/auth/service/auth-service";
 import { getApiErrorMessage } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";

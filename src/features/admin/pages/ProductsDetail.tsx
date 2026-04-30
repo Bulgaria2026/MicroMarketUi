@@ -2,7 +2,7 @@ import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { productKeys, productService } from "@/features/products/services/product-service";
-import type { Product } from "@/features/products/types/product";
+import type { Product, ProductRequest } from "@/features/products/types/product";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
@@ -17,7 +17,7 @@ function ProductEditForm({ product }: { product: Product }) {
   const [enabled, setEnabled] = useState(product.enabled);
 
   const mutation = useMutation({
-    mutationFn: (data: Product) =>
+    mutationFn: (data: ProductRequest) =>
       productService.update(product.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -80,7 +80,19 @@ function ProductEditForm({ product }: { product: Product }) {
         <p className="text-sm text-red-500">Failed to update product</p>
       )}
 
-      <Button onClick={() => mutation.mutate({ ...product, name, price, amount, enabled })} disabled={mutation.isPending}>
+      <Button
+        onClick={() =>
+          mutation.mutate({
+            name,
+            description: product.description,
+            price,
+            discount: product.discount,
+            amount,
+            enabled,
+          })
+        }
+        disabled={mutation.isPending}
+      >
         {mutation.isPending ? "Saving…" : "Save changes"}
       </Button>
     </div>

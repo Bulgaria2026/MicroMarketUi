@@ -2,7 +2,7 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Link, Outlet } from "@tanstack/react-router";
-import { ArrowLeft, LayoutDashboard, Menu, Package, ShoppingBag, Users, X } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, Menu, Package, ShoppingBag, Ticket, Tickets, Users, X } from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
@@ -10,6 +10,8 @@ const navItems = [
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag, exact: false as const },
   { to: "/admin/products", label: "Products", icon: Package, exact: false as const },
   { to: "/admin/users", label: "Users", icon: Users, exact: false as const },
+  { to: "/admin/coupons", label: "Coupons", icon: Ticket, exact: false as const },
+  { to: "/admin/coupon-offers", label: "Offers", icon: Tickets, exact: false as const },
 ] as const;
 
 function SidebarContent({ onNavigate }: Readonly<{ onNavigate?: () => void }>) {

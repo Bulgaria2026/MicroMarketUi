@@ -57,7 +57,11 @@ function OrderCard({ order }: Readonly<{ order: Order }>) {
             </div>
             <div className="flex items-center gap-6 shrink-0 ml-4">
               <span className="text-sm text-muted-foreground">
-                {item.quantity} × {formatCurrency(item.priceAtPurchase)}
+                {item.quantity} ×{" "}
+                {item.originalUnitPrice !== item.priceAtPurchase && (
+                  <span className="line-through mr-1">{formatCurrency(item.originalUnitPrice)}</span>
+                )}
+                {formatCurrency(item.priceAtPurchase)}
               </span>
               <span className="text-sm font-medium w-20 text-right">
                 {formatCurrency(item.quantity * item.priceAtPurchase)}
@@ -70,9 +74,21 @@ function OrderCard({ order }: Readonly<{ order: Order }>) {
       <Separator />
 
       {/* Total */}
-      <div className="flex items-center justify-end gap-6 px-5 py-3">
-        <span className="text-sm text-muted-foreground">Total</span>
-        <span className="font-semibold text-sm w-20 text-right">{formatCurrency(order.totalAmount)}</span>
+      <div className="flex flex-col items-end gap-1 px-5 py-3">
+        {order.couponAmountOff != null && order.couponAmountOff > 0 && (
+          <span className="text-xs text-green-600 dark:text-green-400">
+            Coupon{order.couponCode ? ` ${order.couponCode}` : ""}: -{formatCurrency(order.couponAmountOff)}
+          </span>
+        )}
+        {order.subtotal - order.paidTotal - (order.couponAmountOff ?? 0) > 0.001 && (
+          <span className="text-xs text-green-600 dark:text-green-400">
+            Product discounts: -{formatCurrency(order.subtotal - order.paidTotal - (order.couponAmountOff ?? 0))}
+          </span>
+        )}
+        <div className="flex items-center gap-6">
+          <span className="text-sm text-muted-foreground">Total</span>
+          <span className="font-semibold text-sm w-20 text-right">{formatCurrency(order.paidTotal)}</span>
+        </div>
       </div>
     </div>
   );

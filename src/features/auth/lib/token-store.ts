@@ -1,4 +1,4 @@
-import { authService } from "@/features/auth/auth-service";
+import { authService } from "@/features/auth/service/auth-service";
 import type { AuthResponse } from "@/features/auth/types";
 import { jwtDecode } from "jwt-decode";
 
